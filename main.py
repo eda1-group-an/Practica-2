@@ -12,7 +12,7 @@ def read_int_option(message, start, end):
     Shows an input message and reads the option of the user
 
     :param message: input message
-    :param start: minimum value the user can enter
+    :param start: minimum value the user can enterooo
     :param end: maximum value the user can enter
     :return: the option chosen by the user
     """
