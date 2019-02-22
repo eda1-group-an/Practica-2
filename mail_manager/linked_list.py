@@ -31,13 +31,55 @@ class LinkedList:
         self.head = None
         self.back = None
         self.size = 0
+    
+    def is_empty(self):
+        """
+        Checks if the list is empry or not.
+        
+        :return: True if empty, False otherwise
+        """
+        if self.__len__() == 0:
+            return True
+        else:
+            return False
+
+    def get_head(self):
+        """
+        Returns the head of the linked list. 
+        
+        :return: The head. None if the list is empty
+        """
+        return self.head
+
+    def get_back(self):
+        """
+        Returns the back of the linked list. 
+        
+        :return: The back. None if the list is empty
+        """
+        return self.back
+
+    def set(self,index):
+        """
+        Advances a pointer to a position pointed by an index
+
+        returns: the idxth node of the list
+        """
+        current = self.head 
+        while (index > 1 ):
+            current = current.next
+            index -= 1
+        return current
 
     def append(self, item):
-
         """
         Add an item to the end of the list.
+
+        :param item: The node that will be added.
+        :return: Nothing
         """
-        if self.size == 0:
+
+        if self.is_empty():
             self.head = item
             self.back = item
         
@@ -57,28 +99,47 @@ class LinkedList:
 
         :param index: index where the item should be stored.
         :param item: object to be stored into the linked list.
+        :return: nothing
         """
         if index == 0:
-            self.front.prev = item
-            item.next = self.front
-            self.front = item
-        elif index == self.size:
+            self.head.prev = item
+            item.next = self.head
+            self.head = item
+
+        elif index == self.__len__():
             self.append(item)
-        elif index > self.size:
+
+        elif index > self.__len__():
             raise IndexError("Thats a hell of an index! Keep it lower...")
+
         else:
-            before = self.front
-            while (index > 1 ):
-                before = before.next
-                index -= 1
+            before = self.set(index)
             after = before.next
+
             item.prev = before
             item.next = after
+            
             before.next = item
             after.prev = item
         
         self.size += 1
 
+    def delete(self,current):
+        """
+        """
+        deleted = current
+        before = deleted.prev
+        after = deleted.next
+
+        if before:
+            before.next = after
+        else:
+            self.head = after
+        if after:
+            after.prev = before
+        else:
+            self.back = before
+                    
     def remove(self, item):
         """
         Remove from the list the first occurrence of item.
@@ -88,26 +149,18 @@ class LinkedList:
         :param item: object to be removed from the linked list.
         """
         changed = False
-        if self.size == 1:
-            if current.info.name == item:
+        current = self.head
+        if self.__len__() == 1:
+            if current.data == item:
                 changed = True
                 self.clear()
-        current = self.front
-        while(current):
-            if current.info.name == item:
-                before = current.prev
-                after = current.next
-                if before:
-                    before.next = after
-                else:
-                    self.front = after
-                if after:
-                    after.prev = before
-                else:
-                    self.back = before
-                changed = True
-                break
-            current = current.next
+        else: 
+            while(current):
+                if current.data == item:
+                    self.delete(current)
+                    changed = True
+                    break
+                current = current.next
 
         if not changed:            
             raise ValueError("Mistakes were made...")
@@ -121,8 +174,14 @@ class LinkedList:
 
         :param index: index where the item should be popped (removed and returned).
         """
-
-        return None
+        if (index == -1):
+            deleted = self.back
+            self.back = self.back.prev
+            self.back.next = None
+        else:
+            deleted = self.set(index)
+            self.delete(deleted)
+        return deleted
 
     def clear(self):
         """
@@ -156,8 +215,8 @@ class LinkedList:
         Returns a string representation of the linked list.
         """
         msg = ""
-        current = self.front 
-        while (current!=None):
+        current = self.head 
+        while (current):
             msg += str(current.data.id)
             current = current.next
         
