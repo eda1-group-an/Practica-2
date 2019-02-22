@@ -7,10 +7,12 @@ class Node:
     def __init__(self, data=None):
         """
         Initializes a node instance that will contain some data.
-
         :param data: content of the node. This could be any object, for example, an email.
         """
-        pass
+
+        self.data = data
+        self.next = None
+        self.prev = None
 
 class LinkedList:
     """
@@ -26,13 +28,25 @@ class LinkedList:
         Initializes the linked list. Take into account that you'll need to keep track of the first and/or
         the last element. Maybe is advisable also to have an updated size attribute.
         """
-        pass
+        self.head = None
+        self.back = None
+        self.size = 0
 
     def append(self, item):
+
         """
         Add an item to the end of the list.
         """
-        pass
+        if self.size == 0:
+            self.head = item
+            self.back = item
+        
+        else:
+            item.prev = self.back
+            self.back.next = item
+            self.back = item
+
+        self.size += 1
 
     def insert(self, index, item):
         """
@@ -44,7 +58,26 @@ class LinkedList:
         :param index: index where the item should be stored.
         :param item: object to be stored into the linked list.
         """
-        pass
+        if index == 0:
+            self.front.prev = item
+            item.next = self.front
+            self.front = item
+        elif index == self.size:
+            self.append(item)
+        elif index > self.size:
+            raise IndexError("Thats a hell of an index! Keep it lower...")
+        else:
+            before = self.front
+            while (index > 1 ):
+                before = before.next
+                index -= 1
+            after = before.next
+            item.prev = before
+            item.next = after
+            before.next = item
+            after.prev = item
+        
+        self.size += 1
 
     def remove(self, item):
         """
@@ -54,7 +87,30 @@ class LinkedList:
 
         :param item: object to be removed from the linked list.
         """
-        pass
+        changed = False
+        if self.size == 1:
+            if current.info.name == item:
+                changed = True
+                self.clear()
+        current = self.front
+        while(current):
+            if current.info.name == item:
+                before = current.prev
+                after = current.next
+                if before:
+                    before.next = after
+                else:
+                    self.front = after
+                if after:
+                    after.prev = before
+                else:
+                    self.back = before
+                changed = True
+                break
+            current = current.next
+
+        if not changed:            
+            raise ValueError("Mistakes were made...")
 
     def pop(self, index=-1):
         """
@@ -72,7 +128,7 @@ class LinkedList:
         """
         Remove all items from the list.
         """
-        pass
+        self.__init__()
 
     def index(self, item, start=0, end=None):
         """
@@ -93,11 +149,17 @@ class LinkedList:
 
         :return: the number of elements currently stored in the linked list.
         """
-        return 0
+        return self.size
 
     def __str__(self):
         """
         Returns a string representation of the linked list.
         """
-        return ""
+        msg = ""
+        current = self.front 
+        while (current!=None):
+            msg += str(current.data.id)
+            current = current.next
+        
+        return msg
 
