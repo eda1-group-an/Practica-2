@@ -38,6 +38,7 @@ class LinkedList:
         
         :return: True if empty, False otherwise
         """
+
         if self.__len__() == 0:
             return True
         else:
@@ -61,11 +62,11 @@ class LinkedList:
 
     def set(self,index):
         """
-        Advances a pointer to a position pointed by an index
+        Advances a pointer to a position marked by an index
 
         returns: the idxth node of the list
         """
-        current = self.head 
+        current = self.get_head()
         while (index > 1 ):
             current = current.next
             index -= 1
@@ -84,7 +85,7 @@ class LinkedList:
             self.back = item
         
         else:
-            item.prev = self.back
+            item.prev = self.get_back()
             self.back.next = item
             self.back = item
 
@@ -103,7 +104,7 @@ class LinkedList:
         """
         if index == 0:
             self.head.prev = item
-            item.next = self.head
+            item.next = self.get_head()
             self.head = item
 
         elif index == self.__len__():
@@ -126,7 +127,12 @@ class LinkedList:
 
     def delete(self,current):
         """
+        Deletes an element by making the prev and the next ignore it
+
+        :current: The element that will get ignored
+        :return: Nothing
         """
+
         deleted = current
         before = deleted.prev
         after = deleted.next
@@ -134,12 +140,15 @@ class LinkedList:
         if before:
             before.next = after
         else:
+            after.prev = None
             self.head = after
+
         if after:
             after.prev = before
         else:
+            before.next = None
             self.back = before
-                    
+
     def remove(self, item):
         """
         Remove from the list the first occurrence of item.
@@ -149,7 +158,7 @@ class LinkedList:
         :param item: object to be removed from the linked list.
         """
         changed = False
-        current = self.head
+        current = self.get_head()
         if self.__len__() == 1:
             if current.data == item:
                 changed = True
@@ -175,8 +184,8 @@ class LinkedList:
         :param index: index where the item should be popped (removed and returned).
         """
         if (index == -1):
-            deleted = self.back
-            self.back = self.back.prev
+            deleted = self.get_back()
+            self.back = deleted.prev
             self.back.next = None
         else:
             deleted = self.set(index)
