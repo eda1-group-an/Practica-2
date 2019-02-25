@@ -81,7 +81,22 @@ class Database:
         :param folder_name: Name of the older to which the email is added. If not provided, defaults to outbox folder.
         :return: The email id
         """
-        pass
+
+        self.emails.append(email)
+
+        if folder_name:
+            found = False
+            for folder in self.folders:
+                if folder == folder_name:
+                    found = True
+                    break
+            if not found:    
+                raise MailManagerException("There's no such folder")
+        else:
+            folder_name = "outbox"
+        
+        self.folders[folder_name].emails.append(email)
+                
 
     def remove_email(self, email, folder_name=None):
         """
