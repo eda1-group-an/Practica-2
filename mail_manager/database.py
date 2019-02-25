@@ -81,35 +81,40 @@ class Database:
         :param folder_name: Name of the older to which the email is added. If not provided, defaults to outbox folder.
         :return: The email id
         """
-
-        self.emails.append(email)
+        
+        try:
+            self.emails.append(email)
+        except:
+            pass
 
         if folder_name:
             self.check_folder(folder_name)
         else:
-            folder_name = "outbox"
+            folder_name = "OutBox"
         
-        self.folders[folder_name].emails.append(email)
+        self.folders[folder_name].add_email(email)
 
     def remove_email(self, email, folder_name=None):
 
         """
-         Remove given email from the given folder. If the folder is not found in the Database
+        Remove given email from the given folder. If the folder is not found in the Database
         it should raise a MailManagerException. If no folder_name is provided, the email is removed completely
-         from the database.
+        from the database.
 
         :param email: The email to be removed.
         :param folder_name: The name of the folder from which the email should be removed. If no folder name is
-         provided, the email is removed from all the folders and from the database.
+        provided, the email is removed from all the folders and from the database.
         :return: The number of folder referencing this email.
         """
 
         if folder_name:
             self.check_folder(folder_name)
-            self.folders[folder_name].emails.remove(email)
+            self.folders[folder_name].remove_email(email)
 
         else:
-            self.emails.remove(email)
+            for folder in self.folders:
+                folder.remove(email)
+                self.emails.remove(email)
         
         return self.folders[folder_name]
 
@@ -135,6 +140,7 @@ class Database:
         :return: Returns the list of email ids of a given folder. If the folder_name parameter is not passed
          it returns the list of emails of the database.
         """
+
         email_ids = []
 
         if folder_name:
@@ -190,7 +196,7 @@ class Database:
 
     def check_folder(self,folder_name):
         """
-        Checks if a folder exists. raises an exception if it does not exist
+        Checks if a folder exists. Raises an exception if it does not exist
 
         :param folder: the folder name it checks
         :return: Nothing

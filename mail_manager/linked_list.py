@@ -130,9 +130,12 @@ class LinkedList:
         :param current: The element that will get ignored
         :return: Nothing
         """
-
+        
         before = current.prev
         after = current.next
+
+        if not (before & after):
+            raise MailManagerException("The list is empty...")
 
         if before:
             before.next = after
@@ -180,12 +183,7 @@ class LinkedList:
 
         :param index: index where the item should be popped (removed and returned).
         """
-        if (index == -1):
-            deleted = self.set(self.__len__()) 
-        else:
-            deleted = self.set(index)
-        
-        return self.delete(deleted)
+        return self.delete(self.set(index))
 
     def clear(self):
         """
@@ -205,7 +203,6 @@ class LinkedList:
 
         De momento no sabemos que hace
         """
-
         return 0
 
     def __len__(self):
@@ -227,4 +224,3 @@ class LinkedList:
             current = current.next
         
         return msg
-

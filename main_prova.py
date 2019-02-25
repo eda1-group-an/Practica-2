@@ -6,4 +6,4 @@ from mail_manager.database import Database, DatabaseConfiguration
 from mail_manager.email import Email
 from mail_manager.exceptions import MailManagerException
 
-utils.load_email("emailDB",1)
+utils.load_email("emailDB","message1")

@@ -17,3 +17,23 @@ class Folder:
         """
         self.name = name
         self.emails = LinkedList()
+
+    def add_email(self,email):
+        """
+        Adds an email to the folder
+        """
+        self.emails.append(email)
+    
+    def remove_email(self,email):
+        """
+        Removes a mail from the Folder
+        """
+        self.emails.remove(email)
+    
+    def get_emails(self):
+        """
+        Returns all the mails form the folder in a list
+        
+        :return: A strong of mails
+        """
+        

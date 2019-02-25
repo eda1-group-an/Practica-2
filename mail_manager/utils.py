@@ -16,11 +16,12 @@ def load_email(email_dir, email_id, email_extension='.txt'):
     :param email_extension:
     :return: it returns an email object
     """
-    email = None
-    mail_path = str(email_id)+email_extension
-    file = open("message"+ mail_path,"r") 
-    for line in file:
-        line.strip().split()
+    
+    fd = open(os.path.join(email_dir,email_id+email_extension))
+
+
+    for line in fd:
+        line.split()
 
     return email
 
