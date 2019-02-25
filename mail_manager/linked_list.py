@@ -169,7 +169,7 @@ class LinkedList:
             current = current.next
 
         if not removed:            
-            raise ValueError("Mistakes were made...")
+            raise ValueError("Email not found...")
     
     def pop(self, index=-1):
         """

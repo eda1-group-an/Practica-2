@@ -85,20 +85,14 @@ class Database:
         self.emails.append(email)
 
         if folder_name:
-            found = False
-            for folder in self.folders:
-                if folder == folder_name:
-                    found = True
-                    break
-            if not found:    
-                raise MailManagerException("There's no such folder")
+            self.check_folder(folder_name)
         else:
             folder_name = "outbox"
         
         self.folders[folder_name].emails.append(email)
-                
 
     def remove_email(self, email, folder_name=None):
+
         """
          Remove given email from the given folder. If the folder is not found in the Database
         it should raise a MailManagerException. If no folder_name is provided, the email is removed completely
@@ -110,7 +104,14 @@ class Database:
         :return: The number of folder referencing this email.
         """
 
-        return 0
+        if folder_name:
+            self.check_folder(folder_name)
+            self.folders[folder_name].emails.remove(email)
+
+        else:
+            self.emails.remove(email)
+        
+        return self.folders[folder_name]
 
     def get_email(self, email_id):
         """
@@ -119,6 +120,9 @@ class Database:
         :param email_id:
         :return: If email id is found in the database it returns it. If it is not found it returns None.
         """
+        for email in self.emails:
+            if email.id == email_id:
+                return email
 
         return None
 
@@ -133,6 +137,14 @@ class Database:
         """
         email_ids = []
 
+        if folder_name:
+            self.check_folder(folder_name)
+            for email in self.folders[folder_name].emails:
+                email_ids.append(email.id)
+        else:
+            for email in self.emails:
+                email_ids.append(email.id)
+
         return email_ids
 
     def create_folder(self, folder_name):
@@ -141,8 +153,12 @@ class Database:
 
         :param folder_name: the name of the new folder
         """
-        pass
-
+        try:
+            self.check_folder(folder_name)
+            raise MailManagerException("There's a Folder with that name already!")
+        except:
+            self.folders[folder_name] = Folder(folder_name)
+            
     def remove_folder(self, folder_name):
         """
         Remove given folder from database. If the folder is not found in the Database
@@ -167,5 +183,24 @@ class Database:
         Returns a list with the folder names stored in the database.
         :return: a list of folder names.
         """
+        folderlist = []
+        for folder in self.folders:
+            folderlist.append(folder)
+        return folderlist
 
-        return []
+    def check_folder(self,folder_name):
+        """
+        Checks if a folder exists. raises an exception if it does not exist
+
+        :param folder: the folder name it checks
+        :return: Nothing
+        """
+        found = False
+        for folder in self.folders:
+            if folder == folder_name:
+                found = True
+                break
+
+        if not found:    
+            raise MailManagerException("There's no such folder")
+        
