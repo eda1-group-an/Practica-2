@@ -16,7 +16,13 @@ def load_email(email_dir, email_id, email_extension='.txt'):
     :param email_extension:
     :return: it returns an email object
     """
-    return None
+    email = None
+    mail_path = str(email_id)+email_extension
+    file = open("message"+ mail_path,"r") 
+    for line in file:
+        line.strip().split()
+
+    return email
 
 def write_email(email, db, db_config=None):
     """
@@ -64,3 +70,4 @@ def write_database(db, db_config=None):
     :param db_config: Database Configuration
     """
     pass
+
