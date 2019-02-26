@@ -81,7 +81,7 @@ class Database:
         :param folder_name: Name of the older to which the email is added. If not provided, defaults to outbox folder.
         :return: The email id
         """
-        
+
         try:
             self.emails.append(email)
         except:
@@ -104,7 +104,7 @@ class Database:
         :param email: The email to be removed.
         :param folder_name: The name of the folder from which the email should be removed. If no folder name is
         provided, the email is removed from all the folders and from the database.
-        :return: The number of folder referencing this email.
+        :return: The number of folder referencing this email. ??
         """
 
         if folder_name:
@@ -113,8 +113,11 @@ class Database:
 
         else:
             for folder in self.folders:
-                folder.remove(email)
-                self.emails.remove(email)
+                try:
+                    folder.remove_email(email)
+                except:
+                    pass
+            self.emails.remove(email)
         
         return self.folders[folder_name]
 
@@ -122,7 +125,7 @@ class Database:
         """
         Looks for the given email in the database and returns it
 
-        :param email_id:
+        :param email_id: The id of the mail we are looking for
         :return: If email id is found in the database it returns it. If it is not found it returns None.
         """
         for email in self.emails:
@@ -145,7 +148,7 @@ class Database:
 
         if folder_name:
             self.check_folder(folder_name)
-            for email in self.folders[folder_name].emails:
+            for email in self.folders[folder_name].get_emails():
                 email_ids.append(email.id)
         else:
             for email in self.emails:
@@ -173,7 +176,10 @@ class Database:
 
         :param folder_name: the name of the folder to be removed
         """
-        pass
+        try:
+            self.folders.pop(folder_name)
+        except:
+            raise MailManagerException("There's no such folder")
 
     def search(self, text):
         """

@@ -32,8 +32,13 @@ class Folder:
     
     def get_emails(self):
         """
-        Returns all the mails form the folder in a list
-        
-        :return: A strong of mails
+        Gets a list with all the mails in a linked list
+
+        return: A list with all the mails in the linked list
         """
+        mails_list = []
+        current = self.emails.head
+        while current != None:
+            mails_list.append(current.data)
+        return mails_list
         
