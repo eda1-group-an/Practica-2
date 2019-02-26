@@ -18,13 +18,13 @@ class Folder:
         self.name = name
         self.emails = LinkedList()
 
-    def add_email(self,email):
+    def new_email(self,email):
         """
         Adds an email to the folder
         """
         self.emails.append(email)
     
-    def remove_email(self,email):
+    def unlink_email(self,email):
         """
         Removes a mail from the Folder
         """

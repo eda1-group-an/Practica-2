@@ -83,16 +83,16 @@ class Database:
         """
 
         try:
-            self.emails.append(email)
+            self.emails.append(email) #We only add it on self.emails if he's not already there
         except:
             pass
 
-        if folder_name:
-            self.check_folder(folder_name)
+        if folder_name: 
+            self.check_folder(folder_name) #It checks wheter the folder exists or not
         else:
-            folder_name = "OutBox"
+            folder_name = "OutBox" #If no folder is provided it adds the mail to the outbox folder, it adds it to the folder OutBox
         
-        self.folders[folder_name].add_email(email)
+        self.folders[folder_name].new_email(email) #Method for adding the mail to the folder
 
     def remove_email(self, email, folder_name=None):
 
@@ -107,19 +107,19 @@ class Database:
         :return: The number of folder referencing this email. ??
         """
 
-        if folder_name:
-            self.check_folder(folder_name)
-            self.folders[folder_name].remove_email(email)
+        if folder_name: 
+            self.check_folder(folder_name) #First we check if the folder exists. If it does not, an error will rise 
+            self.folders[folder_name].unlink_email(email)
 
         else:
             for folder in self.folders:
-                try:
-                    folder.remove_email(email)
+                try: #If the email is on the folder, it will remove it
+                    folder.unlink_email(email)
                 except:
                     pass
-            self.emails.remove(email)
-        
-        return self.folders[folder_name]
+            self.emails.remove(email) #It will remove it from the linked list with all the emails
+            
+        return self.folders[folder_name] #Number of folder??
 
     def get_email(self, email_id):
         """
@@ -197,7 +197,7 @@ class Database:
         """
         folderlist = []
         for folder in self.folders:
-            folderlist.append(folder)
+            folderlist.append(folder.name)
         return folderlist
 
     def check_folder(self,folder_name):
