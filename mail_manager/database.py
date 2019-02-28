@@ -167,6 +167,7 @@ class Database:
             raise MailManagerException("There's a Folder with that name already!")
         except:
             self.folders[folder_name] = Folder(folder_name)
+            self.folders[folder_name].name = folder_name
             
     def remove_folder(self, folder_name):
         """

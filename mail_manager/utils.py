@@ -30,12 +30,7 @@ def load_email(email_dir, email_id, email_extension='.txt'):
             if (sum(1 for i in range(len(filled)) if filled[i] == None) != 0 and head): #It checks if there's data not filled and whether we are on the head or not
                 for i in range(len(data)): 
                     if data[i] in line:
-                        counter = 0
-                        for character in line:
-                            counter += 1
-                            if character == " ":
-                                break
-                        filled[i] = line[counter:]
+                        filled[i] = slice(line)
                         break
 
             elif line == "" and head: #A blank line marks the jump between head and body
@@ -50,6 +45,21 @@ def load_email(email_dir, email_id, email_extension='.txt'):
         new_email = Email(filled[0],filled[1],filled[2],filled[3],filled[4],filled[5])
 
         return new_email
+
+def slice(line):
+    """
+    Cuts a string where it found an empty space, and it returns the right side.
+
+    :param line: The line that will be cut in half
+    :return: The slice of the string at the right of the first empty space
+    """
+    counter = 0
+    for character in line:
+        counter += 1
+        if character == " ":
+            break
+    string = line[counter:]
+    return string
 
 def write_email(email, db, db_config=None):
     """
@@ -71,8 +81,8 @@ def delete_email(email, db, db_config=None):
     """
     pass
 
-
 def load_database(db_config):
+
     """
     Loads database using the information stored in the DatabaseConfiguration object.
     This function creates a Database object, reads the "EMConfig.txt" file and fills the Database object with the
@@ -81,14 +91,44 @@ def load_database(db_config):
 
     It raises a MailManagerException if it finds an invalid configuration format.
 
-    This is going to be a long function. Please, try to use as many functions as you can to encapsulate your code in a
-    meaningul way.
-
     :param db_config:
     :return: Database object
     """
-    return Database(db_config,0)
 
+    with (db_config.get_config_path(),"r") as f:
+        content = f.read().splitlines()
+        headers = ["Message-ID","Folders"]
+        writing_folders = False
+        writing_emails = False
+
+        for linea in content:
+            
+            if headers[0] in linea:
+                seed = slice(linea)
+                datab = Database(db_config,seed)
+                continue
+        
+            elif headers[1] in linea:
+                writing_folders = True
+                continue        
+
+            if writing_folders:
+                while (linea != ""):
+                    datab.create_folder(linea)
+                    headers.append(linea)
+                writing_folders = False
+
+            elif writing_emails:
+                pass
+    
+            else:
+                if linea != "":
+                    for header in range(len(headers)):
+                        
+
+                        
+
+    return datab
 def write_database(db, db_config=None):
     """
     Writes the corresponding Email Config File (text file) from a given Database
