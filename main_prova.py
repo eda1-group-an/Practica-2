@@ -9,10 +9,9 @@ from mail_manager.exceptions import MailManagerException
 
 email_extension = ".txt"
 email_dir = "EmailDB"
-email_id = "CAFdmR09@mail.gmail.com"
+email_id = "message1"
 
-
-with open(os.path.join(email_dir,email_id+email_extension),"r") as f:
+with open(os.path.join(email_dir,email_id+email_extension)) as f:
 
     content = f.read().splitlines()
 
@@ -43,6 +42,7 @@ with open(os.path.join(email_dir,email_id+email_extension),"r") as f:
 
     filled.append(body)    
     new_email = Email(filled[0],filled[1],filled[2],filled[3],filled[4],filled[5])
+
 
 
 print(new_email)

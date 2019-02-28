@@ -17,13 +17,39 @@ def load_email(email_dir, email_id, email_extension='.txt'):
     :return: it returns an email object
     """
     
-    fd = open(os.path.join(email_dir,email_id+email_extension))
+    with open(os.path.join(email_dir,email_id+email_extension),"r") as f:
 
+        content = f.read().splitlines()
 
-    for line in fd:
-        line.split()
+        data = ["Message-ID:","From:","To:","Subject:","Date:"]
+        body = ""
+        filled = [None]*5
+        head = True #Controls if the head is over
 
-    return email
+        for line in content: #We look at every line of the file
+            if (sum(1 for i in range(len(filled)) if filled[i] == None) != 0 and head): #It checks if there's data not filled and whether we are on the head or not
+                for i in range(len(data)): 
+                    if data[i] in line:
+                        counter = 0
+                        for character in line:
+                            counter += 1
+                            if character == " ":
+                                break
+                        filled[i] = line[counter:]
+                        break
+
+            elif line == "" and head: #A blank line marks the jump between head and body
+                head = False
+
+            else:
+                body += line
+                if body != "":
+                    body += "\n"
+
+        filled.append(body)    
+        new_email = Email(filled[0],filled[1],filled[2],filled[3],filled[4],filled[5])
+
+        return new_email
 
 def write_email(email, db, db_config=None):
     """
