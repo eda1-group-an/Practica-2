@@ -33,7 +33,7 @@ def load_email(email_dir, email_id, email_extension='.txt'):
                         filled[i] = slice(line)
                         break
 
-            elif line == "" and head: #A blank line marks the jump between head and body
+            elif line == "" and head: #A blank line marks the gap between head and body
                 head = False
 
             else:
@@ -97,39 +97,45 @@ def load_database(db_config):
 
     with (db_config.get_config_path(),"r") as f:
         content = f.read().splitlines()
-        headers = ["Message-ID","Folders"]
+        headers = ["Message-ID:","Folders:","Messages:"]
         writing_folders = False
         writing_emails = False
+        current_folder = ""
 
         for linea in content:
             
             if headers[0] in linea:
                 seed = slice(linea)
                 datab = Database(db_config,seed)
-                continue
+                
         
             elif headers[1] in linea:
                 writing_folders = True
-                continue        
+                        
 
-            if writing_folders:
+            elif headers[2] in linea:
+                writing_emails = True
+                
+
+            elif writing_folders:
                 while (linea != ""):
                     datab.create_folder(linea)
                     headers.append(linea)
                 writing_folders = False
 
             elif writing_emails:
+                while (linea != ""):
+                    datab.add_email(load_email("emailDB",linea),current_folder)
+                writing_emails = False
+                      
+            elif linea == "":
                 pass
-    
-            else:
-                if linea != "":
-                    for header in range(len(headers)):
-                        
 
-                        
 
-    return datab
+
+
 def write_database(db, db_config=None):
+
     """
     Writes the corresponding Email Config File (text file) from a given Database
 
