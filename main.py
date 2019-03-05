@@ -97,15 +97,13 @@ def choose_folder(folder_names):
 
     return folder_name
 
-
 def list_emails(db):
     """
     Shows the list of emails contained in the Database
 
     :param db: An email database.
     """
-    pass
-
+    return db.get_email_ids()
 
 def show_email(db):
     """
@@ -114,8 +112,7 @@ def show_email(db):
 
     :param db: An email database.
     """
-    pass
-
+    print(db.get_email(choose_email(db.get_email_ids())))
 
 def create_email(db):
     """
@@ -134,6 +131,8 @@ def delete_email(db):
 
     :param db: An email database.
     """
+        #if os.path.isfile(myfile):
+
     pass
 
 def show_folders(db):
@@ -264,7 +263,7 @@ def main():
 
     # When the user decides to exit the program it has to save all the information related to the changes done in the
     # email manager. So it writes a new EMConfig file with the new state of folders, emails and Message-Id.
-    utils.write_database(db)
+    utils.write_database(db,db_config)
 
 
 if __name__ == '__main__':

@@ -41,12 +41,11 @@ def load_email(email_dir, email_id, email_extension='.txt'):
                 if body != "":
                     body += "\n"
 
-        filled.append(body)    
-        new_email = Email(filled[0],filled[1],filled[2],filled[3],filled[4],filled[5])
+    filled.append(body)    
+    new_email = Email(filled[0],filled[1],filled[2],filled[3],filled[4],filled[5])
+    return new_email
 
-        return new_email
-
-def slice(line):
+def slice(line, side=None):
     """
     Cuts a string where it found an empty space, and it returns the right side.
 
@@ -58,7 +57,12 @@ def slice(line):
         counter += 1
         if character == " ":
             break
-    string = line[counter:]
+    
+    if not side:
+        string = line[counter:]
+    else:
+        string = line[:counter-1]
+
     return string
 
 def write_email(email, db, db_config=None):
@@ -69,7 +73,8 @@ def write_email(email, db, db_config=None):
     :param db: Database
     :param db_config: Database Configuration
     """
-    pass
+    with open(db_config.get_file_path(),"w") as f:
+        f.write(email.template.format(email))
 
 def delete_email(email, db, db_config=None):
     """
@@ -79,7 +84,13 @@ def delete_email(email, db, db_config=None):
     :param db: Database
     :param db_config: Database Configuration
     """
-    pass
+
+    ## If file exists, delete it ##
+    try:
+        path = db_config.get_file_path(email.data.id)
+        os.remove(path)
+    else:    ## Show an error ##
+        raise MailManagerException("File not found!")
 
 def load_database(db_config):
 
@@ -95,44 +106,48 @@ def load_database(db_config):
     :return: Database object
     """
 
-    with (db_config.get_config_path(),"r") as f:
+    with open(db_config.get_config_path(),"r") as f:
         content = f.read().splitlines()
         headers = ["Message-ID:","Folders:","Messages:"]
-        writing_folders = False
-        writing_emails = False
-        current_folder = ""
+        folders = [] #For error control
 
-        for linea in content:
-            
-            if headers[0] in linea:
-                seed = slice(linea)
-                datab = Database(db_config,seed)
+        try:
+            for linea in content:
                 
-        
-            elif headers[1] in linea:
-                writing_folders = True
-                        
+                if headers[0] in linea: #Case 1: Create the db with the seed given
+                    seed = slice(linea)
+                    datab = Database(db_config,seed)
 
-            elif headers[2] in linea:
-                writing_emails = True
+                elif linea == "":
+                    writing_folders = False
+                    writing_emails = False
+                    
+                elif headers[1] in linea: #Case 2: After word Folders: we start the mode writing_folders
+                    writing_folders = True
                 
-
-            elif writing_folders:
-                while (linea != ""):
+                elif writing_folders:  
                     datab.create_folder(linea)
-                    headers.append(linea)
-                writing_folders = False
+                    folders.append(linea)
+                        
+                elif headers[2] in linea: #Case 3: After word Messages: we start the mode writing_emails
+                    writing_emails = True
+                    current_folder = slice(linea,1) #We take the name of the folder
+                    folders.pop(0) #The folders mails list appear in the order we created them
 
-            elif writing_emails:
-                while (linea != ""):
-                    datab.add_email(load_email("emailDB",linea),current_folder)
-                writing_emails = False
-                      
-            elif linea == "":
-                pass
+                elif writing_emails:
+                    emails = datab.get_email_ids(current_folder)
+                    if linea not in emails:
+                        datab.add_email(load_email("emailDB",linea),current_folder)
+                        
+                elif linea == "End":
+                    break
+        except:
+            raise MailManagerException("EMConfig has some mistakes")
 
-
-
+        if folders == []:
+           return datab
+        else:
+            raise MailManagerException("EMConfig has some mistakes")
 
 def write_database(db, db_config=None):
 
@@ -142,5 +157,27 @@ def write_database(db, db_config=None):
     :param db: Database
     :param db_config: Database Configuration
     """
-    pass
+    with open(db_config.get_config_path(),"w") as f:
+        f.write("Message-ID: "+ db.email_id_seed+"\n")
+        
+        f.write("\n")
+        
+        f.write("Folders:"+"\n")
+        for folder in db.folders:
+            f.write(db.folders[folder].name+"\n")
+        
+        f.write("\n")
+
+        for folder in db.folders:
+            f.write(db.folders[folder].name+" Messages:\n")
+            current = db.folders[folder].get_head()
+            while current != None:
+                f.write(current.data.id+"\n")
+                current = current.next
+            f.write("\n")
+
+
+        f.write("End")
+
+
 

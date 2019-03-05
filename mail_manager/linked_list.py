@@ -45,6 +45,7 @@ class LinkedList:
             return False
 
     def get_head(self):
+
         """
         Returns the head of the linked list. 
         
@@ -61,7 +62,8 @@ class LinkedList:
         current = self.get_head()
         
         while (index > 1 ):
-            if current.data != element:
+            if current.data.id != element.id: 
+                #Comparamos id porque no son el mismo objeto(estan en posiciones de memoria diferentes)
                 current = current.next
                 index -= 1
             else:
@@ -78,12 +80,12 @@ class LinkedList:
         """
 
         if self.is_empty():
-            self.head = item
+            self.head = Node(item)
 
         else:
             back = self.set(self.__len__(),item)
             item.prev = back
-            back.next = item
+            back.next = Node(item)
 
         self.size += 1
 
@@ -100,9 +102,9 @@ class LinkedList:
         """
         if index == 0:
             self.set(self.__len__(),item) #Checks coincidences
-            self.head.prev = item
+            self.head.prev = Node(item)
             item.next = self.get_head()
-            self.head = item
+            self.head = Node(item)
 
         elif index == self.__len__():
             self.append(item)
@@ -118,8 +120,8 @@ class LinkedList:
             item.prev = before
             item.next = after
             
-            before.next = item
-            after.prev = item
+            before.next = Node(item)
+            after.prev = Node(item)
         
         self.size += 1
 
@@ -192,6 +194,7 @@ class LinkedList:
         self.__init__()
 
     def index(self, item, start=0, end=None):
+
         """
         Return first index of value.
 
@@ -218,7 +221,7 @@ class LinkedList:
         Returns a string representation of the linked list.
         """
         msg = ""
-        current = self.head 
+        current = self.get_head() 
         while (current):
             msg += str(current.data.id)
             current = current.next
