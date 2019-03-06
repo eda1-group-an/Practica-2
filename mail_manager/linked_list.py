@@ -1,4 +1,3 @@
-from .exceptions import MailManagerException
 
 class Node:
     """
@@ -30,11 +29,12 @@ class LinkedList:
         the last element. Maybe is advisable also to have an updated size attribute.
         """
         self.head = None
+        self.back = None
         self.size = 0
     
     def is_empty(self):
         """
-        Checks if the list is empry or not.
+        Checks if the list is empty or not.
         
         :return: True if empty, False otherwise
         """
@@ -52,21 +52,25 @@ class LinkedList:
         """
         return self.head
 
-    def set(self,index,element=None):
+    def get_back(self):
+        """
+        Returns the back of the linked list. 
+        
+        :return: The back. None if the list is empty
+        """
+        return self.back
+
+    def set(self,index):
         """
         Advances a pointer to a position marked by an index
-        If an element is given, it will only return the index if the element was not found in the Linked List 
+
         returns: the idxth node of the list
+        ####################
         """
         current = self.get_head()
-        
         while (index > 1 ):
-            if current.data != element:
-                current = current.next
-                index -= 1
-            else:
-                raise MailManagerException("Mail already on the list")
-
+            current = current.next
+            index -= 1
         return current
 
     def append(self, item):
@@ -79,11 +83,12 @@ class LinkedList:
 
         if self.is_empty():
             self.head = item
-
+            self.back = item
+        
         else:
-            back = self.set(self.__len__(),item)
-            item.prev = back
-            back.next = item
+            item.prev = self.get_back()
+            self.back.next = item
+            self.back = item
 
         self.size += 1
 
@@ -97,9 +102,9 @@ class LinkedList:
         :param index: index where the item should be stored.
         :param item: object to be stored into the linked list.
         :return: nothing
+        #################
         """
         if index == 0:
-            self.set(self.__len__(),item) #Checks coincidences
             self.head.prev = item
             item.next = self.get_head()
             self.head = item
@@ -108,10 +113,9 @@ class LinkedList:
             self.append(item)
 
         elif index > self.__len__():
-            raise MailManagerException("Index is too big...")
+            raise IndexError("Thats a hell of an index! Keep it lower...")
 
         else:
-            self.set(self.__len__(),item) #Checks coincidences
             before = self.set(index)
             after = before.next
 
@@ -127,15 +131,14 @@ class LinkedList:
         """
         Deletes an element by making the prev and the next ignore it
 
-        :param current: The element that will get ignored
+        :current: The element that will get ignored
         :return: Nothing
+        #########
         """
-        
-        before = current.prev
-        after = current.next
 
-        if not (before & after):
-            raise MailManagerException("The list is empty...")
+        deleted = current
+        before = deleted.prev
+        after = deleted.next
 
         if before:
             before.next = after
@@ -147,11 +150,7 @@ class LinkedList:
             after.prev = before
         else:
             before.next = None
-        
-        self.size -= 1
-
-        if self.size == 0:
-            self.clear()
+            self.back = before
 
     def remove(self, item):
         """
@@ -161,19 +160,23 @@ class LinkedList:
 
         :param item: object to be removed from the linked list.
         """
-
-        removed = False
+        changed = False
         current = self.get_head()
-        while(current):
+        if self.__len__() == 1:
             if current.data == item:
-                self.delete(current)
-                removed = True
-                break
-            current = current.next
+                changed = True
+                self.clear()
+        else: 
+            while(current):
+                if current.data == item:
+                    self.delete(current)
+                    changed = True
+                    break
+                current = current.next
 
-        if not removed:            
-            raise ValueError("Email not found...")
-    
+        if not changed:            
+            raise ValueError("Mistakes were made...")
+
     def pop(self, index=-1):
         """
         Remove the item at the given position in the list, and return it.
@@ -182,8 +185,16 @@ class LinkedList:
         Raises IndexError if list is empty or index is out of range.
 
         :param index: index where the item should be popped (removed and returned).
+        ##########
         """
-        return self.delete(self.set(index))
+        if (index == -1):
+            deleted = self.get_back()
+            self.back = deleted.prev
+            self.back.next = None
+        else:
+            deleted = self.set(index)
+            self.delete(deleted)
+        return deleted
 
     def clear(self):
         """
@@ -197,11 +208,10 @@ class LinkedList:
 
         Raises a ValueError if there is no such item.
 
-        :param item: el objecto que buscamos
+        :param item: object to be stored into the linked list.
         :param start: position from which the search is going to start.
         :param end: position at which the search is going to end.
 
-        De momento no sabemos que hace
         """
         return 0
 
@@ -224,3 +234,4 @@ class LinkedList:
             current = current.next
         
         return msg
+

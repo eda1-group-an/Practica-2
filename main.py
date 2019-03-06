@@ -45,10 +45,9 @@ def choose_email(email_ids):
 
     else:
         print("The database contains the following emails:")
-        for idx, email_id in enumerate(email_ids):
-            print("  {}. {}".format(idx + 1, email_id))
+        for idx, name in enumerate(email_ids):
+            print("  {}. {}".format(idx + 1, name))
 
-        email_id = None
         cancel = False
         while not cancel and not email_id:
             option = read_int_option("Choose an email: (0 to cancel)\n", 0, len(email_ids) + 1)
@@ -104,7 +103,11 @@ def list_emails(db):
 
     :param db: An email database.
     """
-    pass
+    
+    email_ids=db.get_email_ids()
+    for email in email_ids:
+        print(email)
+
 
 
 def show_email(db):
@@ -114,7 +117,11 @@ def show_email(db):
 
     :param db: An email database.
     """
-    pass
+    
+    
+    email_ids=db.get_email_ids()
+    email=choose_email(email_ids)
+    email.__str__()
 
 
 def create_email(db):
@@ -124,7 +131,7 @@ def create_email(db):
 
     :param db: An email database.
     """
-    pass
+    
 
 
 def delete_email(db):
@@ -134,7 +141,10 @@ def delete_email(db):
 
     :param db: An email database.
     """
-    pass
+    
+    email_ids=db.get_email_ids()
+    email=choose_email(email_ids)
+    db.remove_email(email)
 
 def show_folders(db):
     """
@@ -143,7 +153,10 @@ def show_folders(db):
 
     :param db: An email database.
     """
-    pass
+    
+    folder_names=db.get_folder_names()
+    folder=choose_folder(folder_names)
+    db.get_email_ids(folder)
 
 
 def create_folder(db):
@@ -152,7 +165,9 @@ def create_folder(db):
 
     :param db: An email database.
     """
-    pass
+    
+    folder=input("Introduce the name you want to assign to the folder")
+    db.create_folder(folder)
 
 
 def delete_folder(db):
@@ -161,7 +176,10 @@ def delete_folder(db):
 
     :param db: An email database.
     """
-    pass
+   
+    folder_names=db.get_folder_names()
+    folder=choose_folder(folder_names)
+    db.remove_folder(folder)
 
 
 def add_email_to_folder(db):
@@ -171,7 +189,12 @@ def add_email_to_folder(db):
 
     :param db: An email database.
     """
-    pass
+    
+    email_ids=db.get_email_ids()
+    email_name=choose_email(email_ids)
+    folder_names=db.get_folder_names()
+    folder=choose_folder(folder_names)
+    db.add_email(email_name,folder)
 
 
 def remove_email_from_folder(db):
@@ -181,7 +204,13 @@ def remove_email_from_folder(db):
 
     :param db: An email database.
     """
-    pass
+    
+    folder_names=db.get_folder_names()
+    folder=choose_folder(folder_names)
+    show_folders()
+    email_name=input("Which email do you want to remove?")
+    db.remove_email(email_name,folder)
+
 
 
 def search(db):
@@ -191,7 +220,10 @@ def search(db):
 
     :param db: An email database.
     """
-    pass
+    
+    text=input("Introduce the text you eant to search")
+    email=db.search(text)
+    print(email)
 
 
 def show_menu(db):
