@@ -101,9 +101,12 @@ def list_emails(db):
     """
     Shows the list of emails contained in the Database
 
-    :param db: An email database.
+    :param db: An email database
     """
-    return db.get_email_ids()
+    pass
+
+    #Ha de fer una llista de tots els mails. T'adjunto del pdf lo que posa. List all existing emails: The program should show all existing emails, each in one line showing: a consecutive
+    #number, the sender, the subject (or part of it, if it’s too long) and the creation date. No ha de controlar RES
 
 def show_email(db):
     """
@@ -112,6 +115,7 @@ def show_email(db):
 
     :param db: An email database.
     """
+    #Ja funciona bé. No crec que s'hagi de canviar res
     print(db.get_email(choose_email(db.get_email_ids())))
 
 def create_email(db):
@@ -121,6 +125,11 @@ def create_email(db):
 
     :param db: An email database.
     """
+    # No ha de controlar res. Tots els camps poden ser strings per tant am bmail_subject = input("subject: ") ja está bé
+    #El Message_ID es crea amb message + una funció de la database que es diu assign seed per agefir el número. 
+    #Ha de crear un element de la classe Email i cridar a add email de database per afegirlo (al outbox!) Add email haurá de cridar
+    #a su vez a write email de utils
+    
     pass
 
 
@@ -131,7 +140,7 @@ def delete_email(db):
 
     :param db: An email database.
     """
-        #if os.path.isfile(myfile):
+    #Agafa un mail y el borra. ha de cridar a database en base a un mail amb les funcions que ja ens donen
 
     pass
 
@@ -142,6 +151,7 @@ def show_folders(db):
 
     :param db: An email database.
     """
+    #Super ezy
     pass
 
 
@@ -151,6 +161,7 @@ def create_folder(db):
 
     :param db: An email database.
     """
+    #Bastant ez. Només afegeix un folder a database (que aqui es diu db) .folders
     pass
 
 
@@ -160,6 +171,7 @@ def delete_folder(db):
 
     :param db: An email database.
     """
+    #Bastant ez també
     pass
 
 
@@ -170,6 +182,7 @@ def add_email_to_folder(db):
 
     :param db: An email database.
     """
+    #Add email amb parametre carpeta
     pass
 
 
@@ -180,6 +193,7 @@ def remove_email_from_folder(db):
 
     :param db: An email database.
     """
+    #remove email en parametre carpeta
     pass
 
 
@@ -190,6 +204,8 @@ def search(db):
 
     :param db: An email database.
     """
+    #Aquest re de moment
+    
     pass
 
 
@@ -244,7 +260,6 @@ def show_menu(db):
 
             input("\nPress Enter to continue...")
 
-
 def main():
     """
     MAIN function of the email manager.
@@ -263,7 +278,7 @@ def main():
 
     # When the user decides to exit the program it has to save all the information related to the changes done in the
     # email manager. So it writes a new EMConfig file with the new state of folders, emails and Message-Id.
-    utils.write_database(db,db_config)
+    utils.write_database(db)
 
 
 if __name__ == '__main__':

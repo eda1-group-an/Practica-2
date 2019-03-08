@@ -23,12 +23,16 @@ class Folder:
         Adds an email to the folder
         """
         self.emails.append(email)
+        email.references += 1 #We add one on the references
+
     
     def unlink_email(self,email):
         """
         Removes a mail from the Folder
         """
         self.emails.remove(email)
+        email.references -= 1
+
     
     def get_head(self):
         """

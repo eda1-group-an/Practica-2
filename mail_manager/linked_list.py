@@ -13,9 +13,27 @@ class Node:
 
         self.data = data
         self.next = None
-        self.prev = None
 
 class LinkedList:
+    #Queda por hacer: 
+        #Funcion que busque texto en la linked list
+        #Str por implementar
+
+    #Control de parámetros:
+        # Controla el .next de los nodos
+        # Controla el tamaño de la linked list
+        # Controla el head de la linked list
+        # No debe entrar dentro de los .data de los elementos!
+
+    #Funcionalidades: 
+        # Puede saber si una linked list está vacía o no
+        # Puede saber el tamaño de la linked list
+        # Puede saber cual es el primer elemento de la linked list
+        # Puede insertar elementos al final de la linked list
+        # Puede eliminar un elemento de la linked list si le entra el elemento
+        # Puede reiniciar la linked list
+        # Puede encontrar texto en la lnked list
+        # Puede imprimir una representación de la linked list
     """
     This class implements a linked list.
 
@@ -29,6 +47,7 @@ class LinkedList:
         Initializes the linked list. Take into account that you'll need to keep track of the first and/or
         the last element. Maybe is advisable also to have an updated size attribute.
         """
+
         self.head = None
         self.size = 0
     
@@ -38,54 +57,44 @@ class LinkedList:
         
         :return: True if empty, False otherwise
         """
-
         if self.__len__() == 0:
             return True
         else:
             return False
 
     def get_head(self):
-
         """
         Returns the head of the linked list. 
-        
+
         :return: The head. None if the list is empty
         """
         return self.head
-
-    def set(self,index,element=None):
-        """
-        Advances a pointer to a position marked by an index
-        If an element is given, it will only return the index if the element was not found in the Linked List 
-        returns: the idxth node of the list
-        """
-        current = self.get_head()
-        
-        while (index > 1 ):
-            if current.data.id != element.id: 
-                #Comparamos id porque no son el mismo objeto(estan en posiciones de memoria diferentes)
-                current = current.next
-                index -= 1
-            else:
-                raise MailManagerException("Mail already on the list")
-
-        return current
 
     def append(self, item):
         """
         Add an item to the end of the list.
 
-        :param item: The node that will be added.
+        :param item: The mail that will be added.
         :return: Nothing
         """
+        #Control de entrada:
+            # Esta función recibe un EMAIl y lo convierte en nodo
 
-        if self.is_empty():
-            self.head = Node(item)
+        #Control de errores: 
+            # Esta función controla el aumento del size al añadir un elemento
+            # Esta función no valora si el email tiene formato correcto o no, solo si es de la classe Email
 
-        else:
-            back = self.set(self.__len__(),item)
-            item.prev = back
-            back.next = Node(item)
+        item = Node(item) #First we create a node with the item
+
+        if self.is_empty(): #If the list is empty, we just change the head of the ll
+            self.head = item
+
+        else: #If not, we get through the list until the last node and then we change its .next
+            current = self.get_head()
+            while current.next: 
+                current = current.next
+
+            current.next = item
 
         self.size += 1
 
@@ -100,80 +109,43 @@ class LinkedList:
         :param item: object to be stored into the linked list.
         :return: nothing
         """
-        if index == 0:
-            self.set(self.__len__(),item) #Checks coincidences
-            self.head.prev = Node(item)
-            item.next = self.get_head()
-            self.head = Node(item)
-
-        elif index == self.__len__():
-            self.append(item)
-
-        elif index > self.__len__():
-            raise MailManagerException("Index is too big...")
-
-        else:
-            self.set(self.__len__(),item) #Checks coincidences
-            before = self.set(index)
-            after = before.next
-
-            item.prev = before
-            item.next = after
-            
-            before.next = Node(item)
-            after.prev = Node(item)
-        
-        self.size += 1
-
-    def delete(self,current):
-        """
-        Deletes an element by making the prev and the next ignore it
-
-        :param current: The element that will get ignored
-        :return: Nothing
-        """
-        
-        before = current.prev
-        after = current.next
-
-        if not (before & after):
-            raise MailManagerException("The list is empty...")
-
-        if before:
-            before.next = after
-        else:
-            after.prev = None
-            self.head = after
-
-        if after:
-            after.prev = before
-        else:
-            before.next = None
-        
-        self.size -= 1
-
-        if self.size == 0:
-            self.clear()
+        #Not implemented. We do not use it!
 
     def remove(self, item):
         """
         Remove from the list the first occurrence of item.
-
         Raises ValueError if there is no such item.
 
-        :param item: object to be removed from the linked list.
+        :param item: object(node) to be removed from the linked list.
         """
+        #Control de entrada:
+            # Esta función recibe un EMAIL QUE YA ESTÉ EN LA LINKED LIST
 
-        removed = False
+        #Control de errores: 
+            # Esta función controla la reducción del size al añadir un elemento
+            # Esta función no valora si el nodo tiene formato correcto o no, solo si es de la classe Node
+            # Esta función compara el mismo Email. Eso quiere decir que no podemos crear un nuevo Email y tratar de compararlo
+            # aun cuando tengas los mismos atributos porque nunca encontrará coincidencia.  
+
         current = self.get_head()
-        while(current):
-            if current.data == item:
-                self.delete(current)
-                removed = True
-                break
-            current = current.next
 
-        if not removed:            
+        if current.data == item:
+            self.head = current.next
+            self.size -= 1
+
+        else:        
+            while current:
+                if current.next.data == item:
+                    current.next = current.next.next
+                    self.size -= 1
+                    break
+                else:
+                    current = current.next
+
+        if self.size == 0:
+            self.clear()
+
+        if not current:            
             raise ValueError("Email not found...")
     
     def pop(self, index=-1):
@@ -185,7 +157,7 @@ class LinkedList:
 
         :param index: index where the item should be popped (removed and returned).
         """
-        return self.delete(self.set(index))
+        # We do not use it!
 
     def clear(self):
         """
@@ -206,7 +178,8 @@ class LinkedList:
 
         De momento no sabemos que hace
         """
-        return 0
+
+        #Not implemented yet
 
     def __len__(self):
         """
@@ -224,6 +197,9 @@ class LinkedList:
         current = self.get_head() 
         while (current):
             msg += str(current.data.id)
+            msg+="\n"
             current = current.next
         
         return msg
+        #Not implemented yet
+        

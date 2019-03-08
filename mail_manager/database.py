@@ -6,7 +6,6 @@ from .folder import Folder
 from .exceptions import MailManagerException
 from .linked_list import LinkedList
 
-
 class DatabaseConfiguration:
     """
     This class allow us to configure all the different parameters of the database such as its location.
@@ -61,7 +60,6 @@ class Database:
         #Ver si funciona unlink, add_email por el problema de la comparativa. No puedo comparar un node.data con un email??
         #Buscar texto (queda por hacer)
 
-
     #Control de parámetros:
         #Parametro references de un mail una vez se ha creado. Sumamos con add_email y restamos con remove_email
         #Parametro seed: Vamos controlando el seed con el que se generan los id de los correos
@@ -80,6 +78,7 @@ class Database:
         #Conseguir una lista con todos los nombres de las carpetas
         #Saber si una folder existe o no
         #Asignar un seed a un correo
+        #Funciones de la clase DatabaseConfig, ya que la incluimos
 
     def __init__(self, db_config, seed):
         """
@@ -110,24 +109,27 @@ class Database:
             # -> El id y el folder_name lo controla el main, y el email lo controla tanto create email como load email
 
         #Control de errores: 
-            #Esta función no controla si el mail existe o no -> Se controla en la entrada de datos
-            #Esta función no controla si la carpeta existe o no -> check_folder() lo controla 
-            #Esta función no controla si el mail está en el folder o no -> Lo controla la clase folder
-            #Esta función SI controla las referencias de los mails
+            #Esta función controla si el mail existe o no
+            #Esta función controla si la carpeta existe o no
+            #Esta función controla si el mail está en el folder o no
+            #Esta función no controla las referencias de los mails
 
-    
-        try :
+        # First of all, we add it on self.emails if he's not already there
+        if email.id not in self.get_email_ids():
             self.emails.append(email) #We only add it on self.emails if he's not already there
-        except MailManagerException:
-            pass
 
-        if folder_name: 
-            self.check_folder(folder_name) #It checks wheter the folder exists or not
+        # Second of all, we check the folder where the mail is going
+        if not folder_name:
+            folder_name = "OutBox" #If no folder is provided it adds the mail to the outbox folder.
+
+        if folder_name not in self.folders.keys(): 
+            raise MailManagerException("There's no such Folder")
+
+        # Finally, we add it to the Folder only if it's not there already
+        if email.id not in self.get_email_ids(folder_name):
+            self.folders[folder_name].new_email(email) #Method for adding the mail to the folder
         else:
-            folder_name = "OutBox" #If no folder is provided it adds the mail to the outbox folder, it adds it to the folder OutBox
-        
-        self.folders[folder_name].new_email(email) #Method for adding the mail to the folder
-        email.references += 1 #We add one on the references
+            raise MailManagerException("The mail is already on that Folder!")
 
         return email.id
 
@@ -142,29 +144,29 @@ class Database:
         provided, the email is removed from all the folders and from the database.
         :return: The number of folder referencing this email. ??
         """
+
         #Control de entrada:
             #Esta función no controla el id del mail, la forma del mail ni la forma del folder_name 
             # -> El id y el folder_name lo controla el main, y el email lo controla tanto create email como load email
 
         #Control de errores: 
-            #Esta función no controla si el mail existe o no -> Se controla en la entrada de datos
+            #Esta función si controla si el mail existe o no
             #Esta función no controla si la carpeta existe o no -> check_folder() lo controla 
             #Esta función no controla si el mail está en el folder o no -> Lo controla la clase folder
-            #Esta función SI controla las referencias de los mails
+            #Esta función no controla las referencias de los mails
+        
+        #First we check if the folder exists. If it does not, an error will rise 
+        if folder_name:
+            if folder_name in self.folders.keys(): 
+                self.folders[folder_name].unlink_email(email)
+            else:
+                raise MailManagerException("There's no such Folder")
 
-        if folder_name: 
-            self.check_folder(folder_name) #First we check if the folder exists. If it does not, an error will rise 
-            self.folders[folder_name].unlink_email(email)
-            email.references -= 1
-
-        else:
-            for folder in self.get_folder_names():
-                try: #If the email is on the folder, it will remove it
+        elif not folder_name:
+            for folder in self.folders.keys():
+                if email.id in self.get_email_ids(folder):
                     folder.unlink_email(email) 
-                    email.references -= 1
-                except MailManagerException:
-                    pass
-            self.emails.remove(email) #It will remove it from the main linked list 
+            self.emails.remove(email) #It will remove it from the main db linked list 
         
         return email.references 
 
@@ -209,8 +211,10 @@ class Database:
         email_ids = []
 
         if folder_name:
-            self.check_folder(folder_name)
-            current = self.folders[folder_name].get_head()
+            if folder_name in self.folders.keys():
+                current = self.folders[folder_name].get_head()
+            else:
+                raise MailManagerException("There's no such Folder")
 
         else:
             current = self.emails.get_head()
@@ -233,10 +237,9 @@ class Database:
         #Control de errores: 
             #Esta función no controla si el folder existe, lo controla check_folder()
 
-        try:
-            self.check_folder(folder_name)
+        if folder_name in self.folders.keys():
             raise MailManagerException("There's a Folder with that name already!")
-        except MailManagerException:
+        else:
             self.folders[folder_name] = Folder(folder_name)
             
     def remove_folder(self, folder_name):
@@ -247,14 +250,13 @@ class Database:
 
         :param folder_name: the name of the folder to be removed
         """
-        
         #Control de entrada:
             #El folder name lo controla el main
 
         #Control de errores: 
             #Esta función no controla si el folder existe, lo controla check_folder()
 
-        try:
+        if folder_name in self.folders.keys():
             current = self.folders[folder_name].get_head()
             while current != None:
                 if current.data.references == 1:
@@ -262,7 +264,7 @@ class Database:
                 current = current.next
             self.folders.pop(folder_name)
 
-        except MailManagerException:
+        else:
             raise MailManagerException("There's no such folder")
 
     def search(self, text):
@@ -273,33 +275,6 @@ class Database:
         :return: the list of emails containing that text.
         """
         return []
-
-    def get_folder_names(self):
-        """
-        Returns a list with the folder names stored in the database.
-        :return: a list of folder names.
-        """
-
-        folderlist = []
-        for folder in self.folders:
-            folderlist.append(folder)
-        return folderlist
-
-    def check_folder(self,folder_name):
-        """
-        Checks if a folder exists. Raises an exception if it does not exist
-
-        :param folder_name: the folder name it checks
-        :return: Nothing
-        """
-        found = False
-        for folder in self.get_folder_names():
-            if folder == folder_name:
-                found = True
-                break
-
-        if not found:    
-            raise MailManagerException("There's no such folder")
         
     def assign_seed(self):
         """

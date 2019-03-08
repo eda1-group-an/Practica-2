@@ -14,5 +14,6 @@ email_id = "message1"
 db_config = DatabaseConfiguration("emailDB")
 db = utils.load_database(db_config)
 
-email = utils.load_email(email_dir,email_id)
-print(email)
+to_remove = db.emails.get_head()
+to_remove = to_remove.next.next.data
+db.emails.remove(to_remove)

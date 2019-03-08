@@ -24,13 +24,13 @@ def load_email(email_dir, email_id, email_extension='.txt'):
         data = ["Message-ID:","From:","To:","Subject:","Date:"]
         body = ""
         filled = [None]*5
-        head = True #Controls if the head is over
+        head = True #Controls wether the head is over
 
         for line in content: #We look at every line of the file
-            if (sum(1 for i in range(len(filled)) if filled[i] == None) != 0 and head): #It checks if there's data not filled and whether we are on the head or not
+            if (None in filled) and head: #It checks if there's data not filled and whether we are on the head or not
                 for i in range(len(data)): 
                     if data[i] in line:
-                        filled[i] = slice(line)
+                        filled[i] = slice(line,"right")
                         break
 
             elif line == "" and head: #A blank line marks the gap between head and body
@@ -41,16 +41,16 @@ def load_email(email_dir, email_id, email_extension='.txt'):
                 if body != "":
                     body += "\n"
 
-    filled.append(body)    
-    new_email = Email(filled[0],filled[1],filled[2],filled[3],filled[4],filled[5])
+    new_email = Email(filled[0],filled[1],filled[2],filled[3],filled[4],body)
     return new_email
 
-def slice(line, side=None):
+def slice(line, side):
     """
-    Cuts a string where it found an empty space, and it returns the right side.
+    Cuts a string where it found an empty space, and it returns one of the two sides.
 
     :param line: The line that will be cut in half
-    :return: The slice of the string at the right of the first empty space
+    :param side: The side that we will keep after the cut
+    :return: The slice of the string at the right or left of the first empty space
     """
     counter = 0
     for character in line:
@@ -58,9 +58,9 @@ def slice(line, side=None):
         if character == " ":
             break
     
-    if not side:
+    if side == "right":
         string = line[counter:]
-    else:
+    elif side == "left":
         string = line[:counter-1]
 
     return string
@@ -73,7 +73,8 @@ def write_email(email, db, db_config=None):
     :param db: Database
     :param db_config: Database Configuration
     """
-    with open(db_config.get_file_path(),"w") as f:
+
+    with open(db.db_config.get_file_path(),"w") as f:
         f.write(email.template.format(email))
 
 def delete_email(email, db, db_config=None):
@@ -87,9 +88,8 @@ def delete_email(email, db, db_config=None):
 
     ## If file exists, delete it ##
     try:
-        path = db_config.get_file_path(email.data.id)
-        os.remove(path)
-    else:    ## Show an error ##
+        os.remove(db.db_config.get_file_path(email.data.id))
+    except:    ## Show an error ##
         raise MailManagerException("File not found!")
 
 def load_database(db_config):
@@ -108,36 +108,34 @@ def load_database(db_config):
 
     with open(db_config.get_config_path(),"r") as f:
         content = f.read().splitlines()
-        headers = ["Message-ID:","Folders:","Messages:"]
         folders = [] #For error control
-
         try:
             for linea in content:
-                
-                if headers[0] in linea: #Case 1: Create the db with the seed given
-                    seed = slice(linea)
+                if "Message-ID:" in linea: #Case 1: Create the db with the seed given
+                    seed = slice(linea,"right")
                     datab = Database(db_config,seed)
-
+                    
                 elif linea == "":
                     writing_folders = False
                     writing_emails = False
                     
-                elif headers[1] in linea: #Case 2: After word Folders: we start the mode writing_folders
+                elif "Folders:" in linea: #Case 2: After word Folders: we start the mode writing_folders
                     writing_folders = True
                 
                 elif writing_folders:  
                     datab.create_folder(linea)
                     folders.append(linea)
                         
-                elif headers[2] in linea: #Case 3: After word Messages: we start the mode writing_emails
+                elif "Messages:" in linea: #Case 3: After word Messages: we start the mode writing_emails
                     writing_emails = True
-                    current_folder = slice(linea,1) #We take the name of the folder
-                    folders.pop(0) #The folders mails list appear in the order we created them
+                    current_folder = slice(linea,"left") #We take the name of the folder
+                    if folders[0] == current_folder:
+                        folders.pop(0) #The folders mails list appear in the order we created them
+                    else:
+                        raise MailManagerException("EMConfig has some mistakes")
 
                 elif writing_emails:
-                    emails = datab.get_email_ids(current_folder)
-                    if linea not in emails:
-                        datab.add_email(load_email("emailDB",linea),current_folder)
+                    datab.add_email(load_email(db_config.database_dir,linea),current_folder)
                         
                 elif linea == "End":
                     break
@@ -150,14 +148,14 @@ def load_database(db_config):
             raise MailManagerException("EMConfig has some mistakes")
 
 def write_database(db, db_config=None):
-
     """
     Writes the corresponding Email Config File (text file) from a given Database
 
     :param db: Database
     :param db_config: Database Configuration
     """
-    with open(db_config.get_config_path(),"w") as f:
+
+    with open(db.db_config.get_config_path(),"w") as f:
         f.write("Message-ID: "+ db.email_id_seed+"\n")
         
         f.write("\n")
