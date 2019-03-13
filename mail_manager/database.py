@@ -260,7 +260,7 @@ class Database:
         if folder_name in self.folders.keys():
             current = self.folders[folder_name].get_head()
             while current != None:
-                self.folders[folder_name].unlink_email(current)
+                self.folders[folder_name].unlink_email(current.data)
                 if current.data.references == 0:
                     self.emails.remove(current) #It will remove it from the main linked list 
 

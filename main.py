@@ -232,7 +232,7 @@ def delete (cancelled):
     """
     while not cancelled:
         print("Invalid option. Please try again!")
-        cancelled = read_int_option("Es este el item que quieres borrar? \n 1 -> No. \n 2 -> Si \n Opción: ",1,2)
+        cancelled = read_int_option("Is this the item you wanna delete? \n 1 -> No. \n 2 -> Si \n Opción: ",1,2)
         if cancelled:
             break
         
