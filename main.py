@@ -313,7 +313,9 @@ def remove_email_from_folder(db):
         print("Which email are you willing to remove form the folder?")
         email = db.get_email(choose_email(db.get_email_ids(folder)))
         if email:
-            db.remove_email(email,folder)
+            if db.remove_email(email,folder) == 0:
+                db.remove_email(email)
+                utils.delete_email(email,db)
             print("")
             print("Email removed succesfully!")
 

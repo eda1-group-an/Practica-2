@@ -157,10 +157,7 @@ class Database:
         
         #First we check if the folder exists. If it does not, an error will rise 
         if folder_name:
-            if folder_name in self.folders.keys(): 
-                self.folders[folder_name].unlink_email(email)
-            else:
-                raise MailManagerException("There's no such Folder")
+            self.folders[folder_name].unlink_email(email)
 
         elif not folder_name:
             for folder in self.folders.keys():
