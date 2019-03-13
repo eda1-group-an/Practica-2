@@ -120,6 +120,7 @@ def lista (db,folder_name = None):
             contador += 1
     else:
         print("No items in this list yet!")
+
 def show_email(db):
     """
     This function calls to the choose_email function and it shows the content of the given email chosen
@@ -184,8 +185,11 @@ def create_email(db):
             if str != "":
                 body += ("\n")
 
+    new = Email(email_id, sender, receiver, subject, date, body),db
 
-    utils.write_email(Email(email_id, sender, receiver, subject, date, body),db)
+    db.add_email(new)
+    utils.write_email(new)
+
     print("Email created!")
 
 def delete_email(db):
@@ -200,8 +204,9 @@ def delete_email(db):
     to_delete = db.get_email(choose_email(db.get_email_ids()))
     if to_delete:
         print(to_delete)
-        if delete(read_int_option("Es este el mail que quieres borrar? \n 1 -> No. \n 2 -> Si \n Opción: ",1,2)):
+        if delete(read_int_option("Es este el mail que quieres borrar? \n 1 -> Si. \n 2 -> No. \n Opción: ",1,2)):
             utils.delete_email(to_delete,db)
+            db.remove_email(db)
             print("Email deleted succesfully")
 
 def show_folders(db):
@@ -222,6 +227,7 @@ def create_folder(db):
 
     :param db: An email database.
     """
+
     print("")
     print("Please enter the name of the new folder.")
     db.create_folder(restricted(input("Name: ")))
@@ -232,14 +238,14 @@ def delete (cancelled):
     """
     while not cancelled:
         print("Invalid option. Please try again!")
-        cancelled = read_int_option("Is this the item you wanna delete? \n 1 -> No. \n 2 -> Si \n Opción: ",1,2)
+        cancelled = read_int_option("Is this the item you wanna delete? \n 1 -> Si. \n 2 -> No \n Opción: ",1,2)
         if cancelled:
             break
         
-    if cancelled == 2:
+    if cancelled == 1:
         return True
 
-    elif cancelled == 1:
+    elif cancelled == 2:
         print("")
         print("Returning to the main menu...")
         return False
@@ -259,7 +265,7 @@ def delete_folder(db):
         else:
             print("There are no emails in this folder")
 
-        if delete(read_int_option("Is this the folder you wanna delete? \n 1 -> No. \n 2 -> Si \n Opción: ",1,2)):
+        if delete(read_int_option("Is this the folder you wanna delete? \n 1 -> Si. \n 2 -> No. \n Opción: ",1,2)):
             db.remove_folder(to_delete)
             print("Folder deleted succesfully")
 
@@ -275,12 +281,23 @@ def add_email_to_folder(db):
     """
 
     print("Which email are you willing to add to a folder?")
-    email = choose_email(db.get_email_ids())
+    email = db.get_email(choose_email(db.get_email_ids()))
 
-    print("In which folder do you want to add it?")
-    folder = choose_folder(list(db.folders.keys()))
+    if email: 
+        try:
+            print("In which folder do you want to add it?")
+            folder = choose_folder(list(db.folders.keys()))
 
-    db.add_email(email,folder)
+            if folder:
+                db.add_email(email,folder)
+            
+                print("")
+                print("Email added succesfully!")
+
+        except:
+            print("")
+            print("Mail on that folder already!")
+
 
 def remove_email_from_folder(db):
     """
@@ -292,10 +309,13 @@ def remove_email_from_folder(db):
     print("From which folder do you want to remove a mail?")
     folder = choose_folder(list(db.folders.keys()))
 
-    print("Which email are you willing to remove form the folder?")
-    email = choose_email(db.get_email_ids(folder))
-
-    db.remove_email(email,folder)
+    if folder:
+        print("Which email are you willing to remove form the folder?")
+        email = db.get_email(choose_email(db.get_email_ids(folder)))
+        if email:
+            db.remove_email(email,folder)
+            print("")
+            print("Email removed succesfully!")
 
 def search(db):
     """
