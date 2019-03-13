@@ -30,7 +30,6 @@ def read_int_option(message, start, end):
 
     return option
 
-
 def choose_email(email_ids):
     """
     Shows the emails contained in the database and asks the user to choose one
@@ -51,7 +50,7 @@ def choose_email(email_ids):
         email_id = None
         cancel = False
         while not cancel and not email_id:
-            option = read_int_option("Choose an email: (0 to cancel)\n", 0, len(email_ids) + 1)
+            option = read_int_option("Choose an email: (0 to cancel)\n", 0, len(email_ids))
             if option:
                 email_id = email_ids[option - 1]
 
@@ -63,7 +62,6 @@ def choose_email(email_ids):
                 print("Invalid option, try again.")
 
     return email_id
-
 
 def choose_folder(folder_names):
     """
@@ -84,7 +82,7 @@ def choose_folder(folder_names):
 
         cancel = False
         while not cancel and not folder_name:
-            option = read_int_option("Choose a folder: (0 to cancel)\n", 0, len(folder_names) + 1)
+            option = read_int_option("Choose a folder: (0 to cancel)\n", 0, len(folder_names))
             if option:
                 folder_name = folder_names[option - 1]
 
@@ -103,11 +101,25 @@ def list_emails(db):
 
     :param db: An email database
     """
-    pass
+    print("\n********** Emails list **********")
+    lista(db)
 
-    #Ha de fer una llista de tots els mails. T'adjunto del pdf lo que posa. List all existing emails: The program should show all existing emails, each in one line showing: a consecutive
-    #number, the sender, the subject (or part of it, if it’s too long) and the creation date. No ha de controlar RES
+def lista (db,folder_name = None):
+    """
+    Show the list of email contained either in the Database or in a folder.
 
+    :param db: An email database
+    :param folder_name:  The folder where it looks. If its None, then it shows the list of the mails in the entire database
+    """
+    contador = 1
+
+    if db.get_email_ids(folder_name) != []:
+        for email_id in db.get_email_ids(folder_name):
+            to_print = db.get_email(email_id)
+            print("%s. Sender: %s.  Subject: %s.  Date: %s." % (contador,to_print.sender,to_print.subject,to_print.date))
+            contador += 1
+    else:
+        print("No items in this list yet!")
 def show_email(db):
     """
     This function calls to the choose_email function and it shows the content of the given email chosen
@@ -115,9 +127,40 @@ def show_email(db):
 
     :param db: An email database.
     """
-    #Ja funciona bé. No crec que s'hagi de canviar res
-    print(db.get_email(choose_email(db.get_email_ids())))
+    print("")
+    to_print = choose_email(db.get_email_ids())
+    print("")
+    if to_print:
+        print(db.get_email(to_print))
 
+def restricted(sample):
+    """
+    This function takes care of not using restricted words in the fields that forbide them
+
+    :param sample: The text that will be checked for forbudden words
+    """
+
+    checked = False
+    restrict = ["Message-ID:","From:","To:","Subject:","Date:","Folders:","Messages:","End",""]
+
+    while not checked:
+        if sample not in restrict:
+            checked = True
+            break
+
+        elif sample == "":
+            print("Enter something!")
+
+        else:
+            for i in range(len(restrict)):
+                if restrict[i] in sample:
+                    print ("You can not use the word %s in this field!" %restrict[i])
+                    break
+                    
+        sample = input("Pleas try again: ")    
+
+    return sample
+	
 def create_email(db):
     """
     Asks for the user to fill the fields of an email and creates it in the database. It also creates
@@ -125,13 +168,16 @@ def create_email(db):
 
     :param db: An email database.
     """
-    # No ha de controlar res. Tots els camps poden ser strings per tant am bmail_subject = input("subject: ") ja está bé
-    #El Message_ID es crea amb message + una funció de la database que es diu assign seed per agefir el número. 
-    #Ha de crear un element de la classe Email i cridar a add email de database per afegirlo (al outbox!) Add email haurá de cridar
-    #a su vez a write email de utils
-    
-    pass
+    print("\nPlease enter the following fields: ")
+    email_id = "message"+ str(db.assign_seed())
+    sender = restricted(input("Sender: "))  
+    receiver = restricted(input("Receiver: "))
+    subject = restricted(input("Subject: "))
+    date = restricted(input("Date: "))
+    body = input("Body: ")
 
+    utils.write_email(Email(email_id, sender, receiver, subject, date, body),db)
+    print("Email created!")
 
 def delete_email(db):
     """
@@ -140,9 +186,14 @@ def delete_email(db):
 
     :param db: An email database.
     """
-    #Agafa un mail y el borra. ha de cridar a database en base a un mail amb les funcions que ja ens donen
+    print("")
 
-    pass
+    to_delete = db.get_email(choose_email(db.get_email_ids()))
+    if to_delete:
+        print(to_delete)
+        if delete(read_int_option("Es este el mail que quieres borrar? \n 1 -> No. \n 2 -> Si \n Opción: ",1,2)):
+            utils.delete_email(to_delete,db)
+            print("Email deleted succesfully")
 
 def show_folders(db):
     """
@@ -151,9 +202,10 @@ def show_folders(db):
 
     :param db: An email database.
     """
-    #Super ezy
-    pass
-
+    folder_name = choose_folder(list(db.folders.keys()))
+    if folder_name:
+        print("\n********** %s emails **********" %folder_name)
+        lista(db,folder_name)
 
 def create_folder(db):
     """
@@ -161,9 +213,27 @@ def create_folder(db):
 
     :param db: An email database.
     """
-    #Bastant ez. Només afegeix un folder a database (que aqui es diu db) .folders
-    pass
+    print("")
+    print("Please enter the name of the new folder.")
+    db.create_folder(restricted(input("Name: ")))
+    print("\nFolder created!")
 
+def delete (cancelled):
+    """
+    """
+    while not cancelled:
+        print("Invalid option. Please try again!")
+        cancelled = read_int_option("Es este el item que quieres borrar? \n 1 -> No. \n 2 -> Si \n Opción: ",1,2)
+        if cancelled:
+            break
+        
+    if cancelled == 2:
+        return True
+
+    elif cancelled == 1:
+        print("")
+        print("Returning to the main menu...")
+        return False
 
 def delete_folder(db):
     """
@@ -171,20 +241,37 @@ def delete_folder(db):
 
     :param db: An email database.
     """
-    #Bastant ez també
-    pass
+    
+    to_delete = choose_folder(list(db.folders.keys()))
+    if to_delete and to_delete != "Inbox" and to_delete != "OutBox":
+        if db.folders[to_delete].get_head() != None:
+            print("These are the mails in the folder:")
+            lista(db,to_delete)
+        else:
+            print("There are no emails in this folder")
 
+        if delete(read_int_option("Is this the folder you wanna delete? \n 1 -> No. \n 2 -> Si \n Opción: ",1,2)):
+            db.delete_folder(to_delete)
+            print("Folder deleted succesfully")
 
+    elif to_delete == "Inbox" or to_delete == "OutBox":
+        print("You can not eliminate that folder!")
+    
 def add_email_to_folder(db):
     """
     This functions first calls to the choose_email function. After that, it calls to the choose_folder function and
     adds the chosen email to the chosen folder.
 
-    :param db: An email database.
+    :param db: An email database.ººº
     """
-    #Add email amb parametre carpeta
-    pass
+    
+    print("Which email are you willing to add to a folder?")
+    email = choose_email(db.get_email_ids())
 
+    print("In which folder do you want to add it?")
+    folder = choose_folder(list(db.folders.keys()))
+
+    db.add_email(email,folder)
 
 def remove_email_from_folder(db):
     """
@@ -193,9 +280,13 @@ def remove_email_from_folder(db):
 
     :param db: An email database.
     """
-    #remove email en parametre carpeta
-    pass
+    print("From which folder do you want to remove a mail?")
+    folder = choose_folder(list(db.folders.keys()))
 
+    print("Which email are you willing to remove form the folder?")
+    email = choose_email(db.get_email_ids(folder))
+
+    db.remove_email(email,folder)
 
 def search(db):
     """

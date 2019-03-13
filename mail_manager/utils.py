@@ -21,16 +21,15 @@ def load_email(email_dir, email_id, email_extension='.txt'):
 
         content = f.read().splitlines()
 
-        data = ["Message-ID:","From:","To:","Subject:","Date:"]
+        data = {"Message-ID:":"","From:":"","To:":"","Subject:":"","Date:":""}
         body = ""
-        filled = [None]*5
         head = True #Controls wether the head is over
 
         for line in content: #We look at every line of the file
-            if (None in filled) and head: #It checks if there's data not filled and whether we are on the head or not
-                for i in range(len(data)): 
-                    if data[i] in line:
-                        filled[i] = slice(line,"right")
+            if ("" in data.values()) and head: #It checks if there's data not filled and whether we are on the head or not
+                for keyword in data: 
+                    if keyword in line:
+                        data[keyword] = slice(line,"right")
                         break
 
             elif line == "" and head: #A blank line marks the gap between head and body
@@ -41,7 +40,7 @@ def load_email(email_dir, email_id, email_extension='.txt'):
                 if body != "":
                     body += "\n"
 
-    new_email = Email(filled[0],filled[1],filled[2],filled[3],filled[4],body)
+    new_email = Email(data["Message-ID:"],data["From:"],data["To:"],data["Subject:"],data["Date:"],body)
     return new_email
 
 def slice(line, side):
@@ -73,9 +72,10 @@ def write_email(email, db, db_config=None):
     :param db: Database
     :param db_config: Database Configuration
     """
-
-    with open(db.db_config.get_file_path(),"w") as f:
-        f.write(email.template.format(email))
+    with open(os.path.join(db.db_config.email_dir,email.id+db.db_config.email_extension), "w") as new:
+        new.write(email.template.format(email))
+    
+    db.add_email(email)
 
 def delete_email(email, db, db_config=None):
     """
@@ -86,11 +86,8 @@ def delete_email(email, db, db_config=None):
     :param db_config: Database Configuration
     """
 
-    ## If file exists, delete it ##
-    try:
-        os.remove(db.db_config.get_file_path(email.data.id))
-    except:    ## Show an error ##
-        raise MailManagerException("File not found!")
+    os.remove(db.db_config.get_email_path(email.id))
+    db.remove_email(email)
 
 def load_database(db_config):
 
@@ -113,7 +110,7 @@ def load_database(db_config):
             for linea in content:
                 if "Message-ID:" in linea: #Case 1: Create the db with the seed given
                     seed = slice(linea,"right")
-                    datab = Database(db_config,seed)
+                    datab = Database(db_config,int(seed))
                     
                 elif linea == "":
                     writing_folders = False
@@ -140,7 +137,7 @@ def load_database(db_config):
                 elif linea == "End":
                     break
         except:
-            raise MailManagerException("EMConfig has some mistakes")
+            raise MailManagerException("EMConfig has some mistakes!")
 
         if folders == []:
            return datab
@@ -156,7 +153,7 @@ def write_database(db, db_config=None):
     """
 
     with open(db.db_config.get_config_path(),"w") as f:
-        f.write("Message-ID: "+ db.email_id_seed+"\n")
+        f.write("Message-ID: "+ str(db.email_id_seed)+"\n")
         
         f.write("\n")
         

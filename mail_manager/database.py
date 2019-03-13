@@ -165,7 +165,7 @@ class Database:
         elif not folder_name:
             for folder in self.folders.keys():
                 if email.id in self.get_email_ids(folder):
-                    folder.unlink_email(email) 
+                    self.folders[folder].unlink_email(email) 
             self.emails.remove(email) #It will remove it from the main db linked list 
         
         return email.references 
@@ -184,6 +184,7 @@ class Database:
             # Se supone que la linked list acaba en None!
 
         current = self.emails.get_head()
+
         while current != None:
             if current.data.id == email_id:
                 return current.data
@@ -259,8 +260,10 @@ class Database:
         if folder_name in self.folders.keys():
             current = self.folders[folder_name].get_head()
             while current != None:
-                if current.data.references == 1:
+                self.folders[folder_name].unlink_email(current)
+                if current.data.references == 0:
                     self.emails.remove(current) #It will remove it from the main linked list 
+
                 current = current.next
             self.folders.pop(folder_name)
 

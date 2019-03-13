@@ -24,7 +24,6 @@ class Folder:
         """
         self.emails.append(email)
         email.references += 1 #We add one on the references
-
     
     def unlink_email(self,email):
         """
@@ -33,7 +32,6 @@ class Folder:
         self.emails.remove(email)
         email.references -= 1
 
-    
     def get_head(self):
         """
         """

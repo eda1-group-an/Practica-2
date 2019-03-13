@@ -126,7 +126,7 @@ class LinkedList:
             # Esta función no valora si el nodo tiene formato correcto o no, solo si es de la classe Node
             # Esta función compara el mismo Email. Eso quiere decir que no podemos crear un nuevo Email y tratar de compararlo
             # aun cuando tengas los mismos atributos porque nunca encontrará coincidencia.  
-
+        
         current = self.get_head()
 
         if current.data == item:
@@ -135,12 +135,12 @@ class LinkedList:
 
         else:        
             while current:
-                if current.next.data == item:
-                    current.next = current.next.next
-                    self.size -= 1
-                    break
-                else:
-                    current = current.next
+                if current.next:
+                    if current.next.data == item:
+                        current.next = current.next.next
+                        self.size -= 1
+                        break
+                current = current.next
 
         if self.size == 0:
             self.clear()
@@ -202,4 +202,3 @@ class LinkedList:
         
         return msg
         #Not implemented yet
-        
