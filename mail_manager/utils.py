@@ -72,10 +72,13 @@ def write_email(email, db, db_config=None):
     :param db: Database
     :param db_config: Database Configuration
     """
+
+    db.add_email(email)
+    
     with open(os.path.join(db.db_config.email_dir,email.id+db.db_config.email_extension), "w") as new:
         new.write(email.template.format(email))
     
-    db.add_email(email)
+    
 
 def delete_email(email, db, db_config=None):
     """

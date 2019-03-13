@@ -174,7 +174,16 @@ def create_email(db):
     receiver = restricted(input("Receiver: "))
     subject = restricted(input("Subject: "))
     date = restricted(input("Date: "))
-    body = input("Body: ")
+    print("Body of the message. Keep writing after pressing enter until you write the word end to stop!")
+    stri = input("")
+    body = ""
+    while stri != "end":
+        body += stri    
+        if stri != "end":
+            stri = input("")
+            if str != "":
+                body += ("\n")
+
 
     utils.write_email(Email(email_id, sender, receiver, subject, date, body),db)
     print("Email created!")
@@ -251,7 +260,7 @@ def delete_folder(db):
             print("There are no emails in this folder")
 
         if delete(read_int_option("Is this the folder you wanna delete? \n 1 -> No. \n 2 -> Si \n Opción: ",1,2)):
-            db.delete_folder(to_delete)
+            db.remove_folder(to_delete)
             print("Folder deleted succesfully")
 
     elif to_delete == "Inbox" or to_delete == "OutBox":
@@ -264,7 +273,7 @@ def add_email_to_folder(db):
 
     :param db: An email database.ººº
     """
-    
+
     print("Which email are you willing to add to a folder?")
     email = choose_email(db.get_email_ids())
 

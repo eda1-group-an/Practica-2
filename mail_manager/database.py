@@ -127,7 +127,7 @@ class Database:
 
         # Finally, we add it to the Folder only if it's not there already
         if email.id not in self.get_email_ids(folder_name):
-            self.folders[folder_name].new_email(email) #Method for adding the mail to the folder
+            self.folders[folder_name].new_email(self.get_email(email.id)) #Method for adding the mail to the folder
         else:
             raise MailManagerException("The mail is already on that Folder!")
 
