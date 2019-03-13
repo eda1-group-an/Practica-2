@@ -188,7 +188,7 @@ def create_email(db):
     new = Email(email_id, sender, receiver, subject, date, body),db
 
     db.add_email(new)
-    utils.write_email(new)
+    utils.write_email(new,db)
 
     print("Email created!")
 
@@ -205,8 +205,8 @@ def delete_email(db):
     if to_delete:
         print(to_delete)
         if delete(read_int_option("Es este el mail que quieres borrar? \n 1 -> Si. \n 2 -> No. \n Opción: ",1,2)):
+            db.remove_email(to_delete)
             utils.delete_email(to_delete,db)
-            db.remove_email(db)
             print("Email deleted succesfully")
 
 def show_folders(db):
