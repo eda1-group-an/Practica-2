@@ -167,7 +167,7 @@ class Database:
                 if email.id in self.get_email_ids(folder):
                     self.folders[folder].unlink_email(email) 
             self.emails.remove(email) #It will remove it from the main db linked list 
-        
+            
         return email.references 
 
     def get_email(self, email_id):

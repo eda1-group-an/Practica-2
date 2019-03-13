@@ -74,7 +74,7 @@ def write_email(email, db, db_config=None):
     """
 
     db.add_email(email)
-    
+
     with open(os.path.join(db.db_config.email_dir,email.id+db.db_config.email_extension), "w") as new:
         new.write(email.template.format(email))
     
@@ -89,9 +89,9 @@ def delete_email(email, db, db_config=None):
     :param db_config: Database Configuration
     """
 
-    os.remove(db.db_config.get_email_path(email.id))
     db.remove_email(email)
-
+    os.remove(db.db_config.get_email_path(email.id))
+    
 def load_database(db_config):
 
     """
