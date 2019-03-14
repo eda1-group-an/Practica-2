@@ -9,6 +9,7 @@ from mail_manager.exceptions import MailManagerException
 
 def read_int_option(message, start, end):
     """
+    
     Shows an input message and reads the option of the user
 
     :param message: input message
@@ -112,11 +113,17 @@ def lista (db,folder_name = None):
     :param folder_name:  The folder where it looks. If its None, then it shows the list of the mails in the entire database
     """
     contador = 1
+    max_subject_size = 25
+    reduced_size = 22
 
     if db.get_email_ids(folder_name) != []:
         for email_id in db.get_email_ids(folder_name):
             to_print = db.get_email(email_id)
-            print("%s. Sender: %s.  Subject: %s.  Date: %s." % (contador,to_print.sender,to_print.subject,to_print.date))
+            if len(to_print.subject) > max_subject_size:
+                new_subject = to_print.subject[:reduced_size] + "..."
+                print("%s. Sender: %s.  Subject: %s.  Date: %s." % (contador,to_print.sender,new_subject,to_print.date))
+            else:
+                print("%s. Sender: %s.  Subject: %s.  Date: %s." % (contador,to_print.sender,to_print.subject,to_print.date))
             contador += 1
     else:
         print("No items in this list yet!")
@@ -174,7 +181,7 @@ def create_email(db):
     sender = restricted(input("Sender: "))  
     receiver = restricted(input("Receiver: "))
     subject = restricted(input("Subject: "))
-    date = restricted(input("Date: "))
+    date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print("Body of the message. Keep writing after pressing enter until you write the word end to stop!")
     stri = input("")
     body = ""
@@ -185,7 +192,7 @@ def create_email(db):
             if str != "":
                 body += ("\n")
 
-    new = Email(email_id, sender, receiver, subject, date, body),db
+    new = Email(email_id, sender, receiver, subject, date, body)
 
     db.add_email(new)
     utils.write_email(new,db)
