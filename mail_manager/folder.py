@@ -6,6 +6,9 @@ from .linked_list import LinkedList
 
 
 class Folder:
+    # This class does not do much. It controls the mails inside each Folder, the name of the folder and 
+    # the references of the mails inside
+
     """
     The folder class contains the name of the class and the list of emails.
     Add as many methods as you consider.

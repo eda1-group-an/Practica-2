@@ -1,5 +1,4 @@
 #NIA's: 217447, 217723, 194985. Group Code: AN. Professor: Sergio Ivan Giraldo 
-
 import os
 import re
 import logging
@@ -78,8 +77,6 @@ def write_email(email, db, db_config=None):
     with open(os.path.join(db.db_config.email_dir,email.id+db.db_config.email_extension), "w") as new:
         new.write(email.template.format(email))
     
-    
-
 def delete_email(email, db, db_config=None):
     """
     Removes the email text file corresponding to a given email object (Optional, be careful)
@@ -154,27 +151,26 @@ def write_database(db, db_config=None):
     :param db_config: Database Configuration
     """
 
-    with open(db.db_config.get_config_path(),"w") as f:
-        f.write("Message-ID: "+ str(db.email_id_seed)+"\n")
+    with open(db.db_config.get_config_path(),"w") as f: # we use f because its short and we are going to use it a lot of times! 
+        f.write("Message-ID: "+ str(db.email_id_seed)+"\n") # First the msg_id
         
-        f.write("\n")
+        f.write("\n") #Jump line
         
-        f.write("Folders:"+"\n")
+        f.write("Folders:"+"\n") 
         for folder in db.folders:
             f.write(db.folders[folder].name+"\n")
         
         f.write("\n")
 
-        for folder in db.folders:
+        for folder in db.folders: 
             f.write(db.folders[folder].name+" Messages:\n")
             current = db.folders[folder].get_head()
             while current != None:
-                f.write(current.data.id+"\n")
+                f.write(current.data.id+"\n") #we  go through the linked list and we call all the .id 
                 current = current.next
             f.write("\n")
 
-
-        f.write("End")
+        f.write("End") #Kewword for the end of the doc
 
 
 

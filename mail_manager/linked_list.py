@@ -17,11 +17,7 @@ class Node:
         self.next = None
 
 class LinkedList:
-    #Queda por hacer: 
-        #Funcion que busque texto en la linked list
-        #Str por implementar
-
-    #Control de parámetros:
+      #Control de parámetros:
         # Controla el .next de los nodos
         # Controla el tamaño de la linked list
         # Controla el head de la linked list
@@ -36,6 +32,7 @@ class LinkedList:
         # Puede reiniciar la linked list
         # Puede encontrar texto en la lnked list
         # Puede imprimir una representación de la linked list
+
     """
     This class implements a linked list.
 
@@ -88,7 +85,7 @@ class LinkedList:
 
         item = Node(item) #First we create a node with the item
 
-        if self.is_empty(): #If the list is empty, we just change the head of the ll
+        if self.is_empty(): #If the list is empty, we just change the head of the linked list
             self.head = item
 
         else: #If not, we get through the list until the last node and then we change its .next
@@ -118,7 +115,7 @@ class LinkedList:
         Remove from the list the first occurrence of item.
         Raises ValueError if there is no such item.
 
-        :param item: object(node) to be removed from the linked list.
+        :param item: object(email) to be removed from the linked list.
         """
         #Control de entrada:
             # Esta función recibe un EMAIL QUE YA ESTÉ EN LA LINKED LIST
@@ -131,23 +128,24 @@ class LinkedList:
         
         current = self.get_head()
 
-        if current.data == item:
+        if current.data == item: #If the item matches with the first one, we change the head of the linked list for its second element (accesseb via .next)
             self.head = current.next
             self.size -= 1
 
         else:        
-            while current:
-                if current.next:
-                    if current.next.data == item:
-                        current.next = current.next.next
+            while current: #We go through the entire linked list until we find the break
+                if current.next: #We only enter if current.next exists.  In each iteration we look at the next one, so there is no problem with missing the last one element because we check it in 
+                    #the iteration before
+                    if current.next.data == item: #When comparing nodes with emails, we acces to the .data atribute
+                        current.next = current.next.next #We just ignore the element with this line
                         self.size -= 1
                         break
                 current = current.next
 
         if self.size == 0:
-            self.clear()
+            self.clear() #If we emptied the list, we reset it (the header atm)
 
-        if not current:            
+        if not current: #If current == next it means no matches were made. Error!        
             raise ValueError("Email not found...")
     
     def pop(self, index=-1):
@@ -194,7 +192,7 @@ class LinkedList:
     def __str__(self):
         """
         Returns a string representation of the linked list.
-        """
+        """ 
         msg = ""
         current = self.get_head() 
         while (current):
@@ -203,4 +201,5 @@ class LinkedList:
             current = current.next
         
         return msg
-        #Not implemented yet
+        
+        #We implemented it but we do not use it. Choose email from the main could use it.
