@@ -38,29 +38,34 @@ def load_email(email_dir, email_id, email_extension='.txt'):
 
             else:
                 body += line
-                body += "\n"
+                body += "\n" #We want to respect the original spacing
 
     new_email = Email(data["Message-ID:"],data["From:"],data["To:"],data["Subject:"],data["Date:"],body)
-    return new_email
+    return new_email #we pack all the info into an Email object and return it
 
 def slice(line, side):
     """
     Cuts a string where it found an empty space, and it returns one of the two sides.
 
     :param line: The line that will be cut in half
-    :param side: The side that we will keep after the cut
+    :param side: The side that will be kept after the cut
     :return: The slice of the string at the right or left of the first empty space
     """
-    counter = 0
+    # Although it's not a function that alters something physically, it's needed for the functions here, so thats why it's in utils
+    
+    counter = 0 #To know where to cut
+    do_not_keep_the_space = 1 #To remove the blank space when keeping the left part
+
     for character in line:
         counter += 1
-        if character == " ":
+        if character == " ": #When we find an empty space, we stop the loop
             break
     
     if side == "right":
-        string = line[counter:]
+        string = line[counter:] 
+
     elif side == "left":
-        string = line[:counter-1]
+        string = line[:counter-do_not_keep_the_space]
 
     return string
 
@@ -72,6 +77,7 @@ def write_email(email, db, db_config=None):
     :param db: Database
     :param db_config: Database Configuration
     """
+    #This function does not check parameters. All is checked in the db or the main! Reasons why we do this on the handout
 
     with open(os.path.join(db.db_config.email_dir,email.id+db.db_config.email_extension), "w") as new:
         new.write(email.template.format(email))
@@ -84,6 +90,7 @@ def delete_email(email, db, db_config=None):
     :param db: Database
     :param db_config: Database Configuration
     """
+    #This function does not check parameters. All is checked in the db or the main! Reasons why we do this on the handout
 
     os.remove(db.db_config.get_email_path(email.id))
     
@@ -104,42 +111,58 @@ def load_database(db_config):
     with open(db_config.get_config_path(),"r") as f:
         content = f.read().splitlines()
         folders = [] #For error control
-        try:
+        inbox_present = False #To check for the folder
+        outbox_present = False #To check for the folder
+
+        try: #For general errors managing. 
+
             for linea in content:
                 if "Message-ID:" in linea: #Case 1: Create the db with the seed given
                     seed = slice(linea,"right")
                     datab = Database(db_config,int(seed))
                     
-                elif linea == "":
+                elif linea == "": #When we find a blank line, we reset what we're doing and start over askin where we are
                     writing_folders = False
                     writing_emails = False
                     
                 elif "Folders:" in linea: #Case 2: After word Folders: we start the mode writing_folders
                     writing_folders = True
                 
-                elif writing_folders:  
+                elif writing_folders:   #If we are writing folders, we create the folder on every line
                     datab.create_folder(linea)
-                    folders.append(linea)
+                    folders.append(linea) #folders list for error control
                         
                 elif "Messages:" in linea: #Case 3: After word Messages: we start the mode writing_emails
                     writing_emails = True
                     current_folder = slice(linea,"left") #We take the name of the folder
+
+                    if current_folder == "OutBox": #This folder has to be in the file!
+                        outbox_present = True
+
+                    if current_folder == "Inbox": #This folder has to be in the file!
+                        inbox_present = True
+
                     if folders[0] == current_folder:
                         folders.pop(0) #The folders mails list appear in the order we created them
                     else:
                         raise MailManagerException("EMConfig has some mistakes")
 
-                elif writing_emails:
+                elif writing_emails: # We first  load the mail with the utils function load_email, then we add it to the current_folder 
                     datab.add_email(load_email(db_config.database_dir,linea),current_folder)
                         
-                elif linea == "End":
+                elif linea == "End": #We check for the 2 important folders
+                    if not inbox_present:
+                        raise MailManagerException("no Inbox folder!")
+                    if not outbox_present:
+                        raise MailManagerException("no OutBox folder!")
                     break
         except:
             raise MailManagerException("EMConfig has some mistakes!")
 
-        if folders == []:
+        if folders == []:  
            return datab
-        else:
+
+        else: #If some folders have no "folder Messages:" line, we are not good with the EMconfig file.
             raise MailManagerException("EMConfig has some mistakes")
 
 def write_database(db, db_config=None):
