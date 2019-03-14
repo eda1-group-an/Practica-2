@@ -153,8 +153,7 @@ class Database:
 
         #Control de errores: 
             #Esta función si controla si el mail existe o no
-            #Esta función no controla si la carpeta existe o no -> check_folder() lo controla 
-            #Esta función no controla si el mail está en el folder o no -> Lo controla la clase folder
+            #Esta función si controla si la carpeta existe o no 
             #Esta función no controla las referencias de los mails
         
         #First we check if the folder exists. If it does not, an error will rise 
@@ -207,8 +206,8 @@ class Database:
             #El folder name lo controla el main
 
         #Control de errores: 
-            #Esta función no controla si el folder existe, lo controla check_folder()
-            #Esta función no controla si la lista de mails está vacía o no
+            #Esta función si controla si el folder existe
+            #Esta función no controla si la folder está vacía o no. Si está vacia devuelve una lista vacia
             #Esta función no controla si un mail está repetido en un folder
 
         email_ids = []
@@ -278,6 +277,12 @@ class Database:
         :param text: the text to be searched
         :return: the list of emails containing that text.
         """
+        #Control de entrada:
+            #text puede ser cualquier string menos una posición en blanco
+
+        #Control de errores: 
+            #Esta función no controla si hay coincidencias o no. 
+
         matches = []
 
         for ide in self.get_email_ids():
@@ -293,5 +298,5 @@ class Database:
 
         :return: the new seed for the mail
         """
-        self.email_id_seed += 1
+        self.email_id_seed += 1 #We sum one to the atribute
         return self.email_id_seed
