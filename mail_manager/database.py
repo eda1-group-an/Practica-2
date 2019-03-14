@@ -243,7 +243,7 @@ class Database:
         else:
             self.folders[folder_name] = Folder(folder_name)
             
-    def remove_folder(self, folder_name):
+    def remove_folder(self, folder_name): 
         """
         Remove given folder from database. If the folder is not found in the Database
         it should raise a MailManagerException. If some of the emails that belong to that folder doesn't belong
@@ -262,7 +262,7 @@ class Database:
             while current != None:
                 self.folders[folder_name].unlink_email(current.data)
                 if current.data.references == 0:
-                    self.emails.remove(current) #It will remove it from the main linked list 
+                    self.emails.remove(current.data) #It will remove it from the main linked list 
                 current = current.next
             self.folders.pop(folder_name)
 

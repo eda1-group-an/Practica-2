@@ -320,7 +320,14 @@ def delete_folder(db):
             print("There are no emails in this folder")
 
         if delete(read_int_option("Is this the folder you wanna delete? \n 1 -> Si. \n 2 -> No. \n Opción: ",1,2)): #always check with the user for confirmation 
+            potential_outcasts = db.get_email_ids(folder_to_delete)
+            for ide in potential_outcasts:
+                email = db.get_email(ide)
+                if email.references == 1:
+                    utils.delete_email(email,db)
             db.remove_folder(folder_to_delete) #we call the database function
+
+
             print("Folder deleted succesfully")
 
     elif folder_to_delete == "Inbox" or folder_to_delete == "OutBox": 
