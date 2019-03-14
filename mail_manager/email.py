@@ -1,3 +1,5 @@
+#NIA's: 217447, 217723, 194985. Group Code: AN. Professor: Sergio Ivan Giraldo 
+
 from .linked_list import LinkedList
 
 class Email:

@@ -1,3 +1,5 @@
+#NIA's: 217447, 217723, 194985. Group Code: AN. Professor: Sergio Ivan Giraldo 
+
 import logging
 import datetime
 
@@ -320,18 +322,17 @@ def delete_folder(db):
             print("There are no emails in this folder")
 
         if delete(read_int_option("Is this the folder you wanna delete? \n 1 -> Si. \n 2 -> No. \n Opción: ",1,2)): #always check with the user for confirmation 
-            potential_outcasts = db.get_email_ids(folder_to_delete)
+            potential_outcasts = db.get_email_ids(folder_to_delete) #All the references of the mails of the folder will be checked
             for ide in potential_outcasts:
                 email = db.get_email(ide)
-                if email.references == 1:
-                    utils.delete_email(email,db)
+                if email.references == 1: #If you references atribute is 1 (gonna be 0 when the folder is gone) it's game over for you
+                    utils.delete_email(email,db) #we remove it physically from the system
             db.remove_folder(folder_to_delete) #we call the database function
-
 
             print("Folder deleted succesfully")
 
     elif folder_to_delete == "Inbox" or folder_to_delete == "OutBox": 
-        print("You can not eliminate that folder!")
+        print("You can not eliminate that folder!") 
     
 
 def add_email_to_folder(db):
@@ -377,9 +378,10 @@ def remove_email_from_folder(db):
     if folder:
         print("Which email are you willing to remove form the folder?")
         email = db.get_email(choose_email(db.get_email_ids(folder)))
+        #Then we take the email from the folder
         if email:
-            if db.remove_email(email,folder) == 0:
-                db.remove_email(email)
+            if db.remove_email(email,folder) == 0: #remove_email return the number of references. If it's the last reference, we delete it from the system
+                db.remove_email(email) 
                 utils.delete_email(email,db)
             print("")
             print("Email removed succesfully!")
@@ -392,12 +394,12 @@ def search(db):
     :param db: An email database.
     """
 
-    search = input("Enter the string of text you want to look for in the database (0 to cancel): ")
+    search = input("Enter the string of text you want to look for in the database (0 to cancel): ") # You cann add any string you want but an empty space
     while search == "":
         search = input("Please enter something (0 to cancel): ")
 
     if search != "0":
-        if db.search(search) != []:
+        if db.search(search) != []: #db search returns us a list of mails with the matches
             for mail in db.search(search):
                 print(mail)
                 print("")
