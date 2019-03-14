@@ -20,9 +20,9 @@ def load_email(email_dir, email_id, email_extension='.txt'):
     
     with open(os.path.join(email_dir,email_id+email_extension),"r") as f:
 
-        content = f.read().splitlines()
+        content = f.read().splitlines() # we divide all the content into lines on a list
 
-        data = {"Message-ID:":"","From:":"","To:":"","Subject:":"","Date:":""}
+        data = {"Message-ID:":"","From:":"","To:":"","Subject:":"","Date:":""} #Keywords of the fields
         body = ""
         head = True #Controls wether the head is over
 
@@ -38,8 +38,7 @@ def load_email(email_dir, email_id, email_extension='.txt'):
 
             else:
                 body += line
-                if body != "":
-                    body += "\n"
+                body += "\n"
 
     new_email = Email(data["Message-ID:"],data["From:"],data["To:"],data["Subject:"],data["Date:"],body)
     return new_email
