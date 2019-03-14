@@ -263,7 +263,6 @@ class Database:
                 self.folders[folder_name].unlink_email(current.data)
                 if current.data.references == 0:
                     self.emails.remove(current) #It will remove it from the main linked list 
-
                 current = current.next
             self.folders.pop(folder_name)
 
