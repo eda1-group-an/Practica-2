@@ -157,7 +157,10 @@ class Database:
         
         #First we check if the folder exists. If it does not, an error will rise 
         if folder_name:
-            self.folders[folder_name].unlink_email(email)
+            if folder_name in self.folders.keys(): 
+                self.folders[folder_name].unlink_email(email)
+            else:
+                raise MailManagerException("There's no such Folder")
 
         elif not folder_name:
             for folder in self.folders.keys():
@@ -274,7 +277,14 @@ class Database:
         :param text: the text to be searched
         :return: the list of emails containing that text.
         """
-        return []
+        matches = []
+
+        for ide in self.get_email_ids():
+            email = self.get_email(ide)
+            if text in email.sender or text in email.receiver or text in email.subject or text in email.date or text in email.body:
+                matches.append(email)
+
+        return matches
         
     def assign_seed(self):
         """

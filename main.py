@@ -326,10 +326,21 @@ def search(db):
 
     :param db: An email database.
     """
-    #Aquest re de moment
-    
-    pass
 
+    search = input("Enter the string of text you want to look for in the database (0 to cancel): ")
+    while search == "":
+        search = input("Please enter something (0 to cancel): ")
+
+    if search != "0":
+        if db.search(search) != []:
+            for mail in db.search(search):
+                print(mail)
+                print("")
+                print("")
+            print("These are all the mails containing the string %s. " %(search))
+
+        else:
+            print("There are no mails containging the string %s. " %(search))
 
 def show_menu(db):
     """
