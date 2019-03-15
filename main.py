@@ -401,8 +401,8 @@ def search(db):
     if search != "0":
         if db.search(search) != []: #db search returns us a list of mails with the matches
             for mail in db.search(search):
-                print(mail)
                 print("")
+                print(mail)
                 print("")
             print("These are all the mails containing the string %s. " %(search))
 

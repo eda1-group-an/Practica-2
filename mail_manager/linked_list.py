@@ -202,4 +202,5 @@ class LinkedList:
         
         return msg
         
-        #We implemented it but we do not use it. Choose email from the main could use it.
+        #We implemented it but we do not use it in the final version. We used it for our internal testing
+        # Choose email from the main could use it.
