@@ -124,11 +124,11 @@ def lista (db,folder_name = None):
             string = "" #The line we are going to pring
             to_print = db.get_email(email_id) #We will use some email properties that will be displayed at the list
             
-            string += ("%s. Sender: %s." % (contador,trim(to_print.sender)))
+            string += ("%s. Sender: %s" % (contador,trim(to_print.sender)))
             string += (pad - len(string)) * space
-            string += ("Subject: %s." % (trim(to_print.subject)))
+            string += ("Subject: %s" % (trim(to_print.subject)))
             string += (secondpad - len(string)) * space
-            string +=  ("Date: %s." % (to_print.date))
+            string +=  ("Date: %s" % (to_print.date))
             print(string)
 
             contador += 1 #To the next item!
@@ -138,7 +138,10 @@ def lista (db,folder_name = None):
 
 def trim(text):
     """
-
+    It trims a text for the padding on the list if it exceeds a max_size length. For Aesthetical reasons.
+    
+    :param text: The string that might get trimmed
+    :return: The trimmed text if its too long. The same text otherwise
     """
     max_size = 35 # For addind "..." when the subject is too large
     reduced_size = 32 #The new size for the subject if its too large. 25 minus 3 points("...") = 22
@@ -147,6 +150,7 @@ def trim(text):
         return text[:reduced_size] + "..."
     else:
         return text
+        
 def show_email(db):
     """
     This function calls to the choose_email function and it shows the content of the given email chosen

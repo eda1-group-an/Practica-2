@@ -134,10 +134,10 @@ class LinkedList:
 
         else:        
             while current: #We go through the entire linked list until we find the break
-                if current.next: #We only enter if current.next exists.  In each iteration we look at the next one, so there is no problem with missing the last one element because we check it in 
-                    #the iteration before
+                if current.next: #We only enter if current.next exists.  In each iteration we look at the next one, so there is no problem with missing the last one element 
+                    #because we checked it in the iteration before
                     if current.next.data == item: #When comparing nodes with emails, we acces to the .data atribute
-                        current.next = current.next.next #We just ignore the element with this line
+                        current.next = current.next.next #We just ignore the item with this line
                         self.size -= 1
                         if self.size == 0:
                             self.clear() #If we emptied the list, we reset it (the header atm)
