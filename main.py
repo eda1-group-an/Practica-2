@@ -114,7 +114,7 @@ def lista (db,folder_name = None):
     :param db: An email database
     :param folder_name:  The folder where it looks. If its None, then it shows the list of the mails in the entire database
     """
-    contador = 1 #For the numbering at the start of each string 
+    contador = 1 #For the enumerate at the start of each string 
     pad = 50 # For a better visualization of the list
     secondpad = pad*2 # The second padding is at the double of distance than the first
     space = " " #For adding spaces when padding
@@ -143,14 +143,14 @@ def trim(text):
     :param text: The string that might get trimmed
     :return: The trimmed text if its too long. The same text otherwise
     """
-    max_size = 35 # For addind "..." when the subject is too large
+    max_size = 35 # For adding "..." when the subject is too large
     reduced_size = 32 #The new size for the subject if its too large. 25 minus 3 points("...") = 22
 
     if len(text) > max_size: #We control the size of a sender to a max of chars
         return text[:reduced_size] + "..."
     else:
         return text
-        
+
 def show_email(db):
     """
     This function calls to the choose_email function and it shows the content of the given email chosen
