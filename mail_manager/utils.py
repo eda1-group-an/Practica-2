@@ -17,28 +17,35 @@ def load_email(email_dir, email_id, email_extension='.txt'):
     :param email_extension:
     :return: it returns an email object
     """
+    try: 
+        with open(os.path.join(email_dir,email_id+email_extension),"r") as f:
+
+            content = f.read().splitlines() # we divide all the content into lines on a list
+
+            data = {"Message-ID:":"","From:":"","To:":"","Subject:":"","Date:":""} #Keywords of the fields
+            body = ""
+            head = True #Controls wether the head is over
+
+            for line in content: #We look at every line of the file
+                if ("" in data.values()) and head: #It checks if there's data not filled and whether we are on the head or not
+                    for keyword in data: 
+                        if keyword in line:
+                            data[keyword] = slice(line,"right")
+                            break
+
+                elif line == "" and head: #A blank line marks the gap between head and body
+                    head = False
+
+                else:
+                    body += line
+                    body += "\n" #We want to respect the original spacing
+
+            if head ==True:
+                raise MailManagerException("Mail has some mistakes")
     
-    with open(os.path.join(email_dir,email_id+email_extension),"r") as f:
+    except FileNotFoundError:
+        raise MailManagerException("Mail not found...")
 
-        content = f.read().splitlines() # we divide all the content into lines on a list
-
-        data = {"Message-ID:":"","From:":"","To:":"","Subject:":"","Date:":""} #Keywords of the fields
-        body = ""
-        head = True #Controls wether the head is over
-
-        for line in content: #We look at every line of the file
-            if ("" in data.values()) and head: #It checks if there's data not filled and whether we are on the head or not
-                for keyword in data: 
-                    if keyword in line:
-                        data[keyword] = slice(line,"right")
-                        break
-
-            elif line == "" and head: #A blank line marks the gap between head and body
-                head = False
-
-            else:
-                body += line
-                body += "\n" #We want to respect the original spacing
 
     new_email = Email(data["Message-ID:"],data["From:"],data["To:"],data["Subject:"],data["Date:"],body)
     return new_email #we pack all the info into an Email object and return it
@@ -78,9 +85,11 @@ def write_email(email, db, db_config=None):
     :param db_config: Database Configuration
     """
     #This function does not check parameters. All is checked in the db or the main! Reasons why we do this on the handout
-
-    with open(os.path.join(db.db_config.email_dir,email.id+db.db_config.email_extension), "w") as new:
-        new.write(email.template.format(email))
+    try:
+        with open(os.path.join(db.db_config.email_dir,email.id+db.db_config.email_extension), "w") as new:
+            new.write(email.template.format(email))
+    except:
+        raise MailManagerException("No email database detected!")
     
 def delete_email(email, db, db_config=None):
     """
@@ -91,9 +100,11 @@ def delete_email(email, db, db_config=None):
     :param db_config: Database Configuration
     """
     #This function does not check parameters. All is checked in the db or the main! Reasons why we do this on the handout
+    try:
+        os.remove(db.db_config.get_email_path(email.id))
+    except FileNotFoundError:
+        raise MailManagerException("Mail not found...")
 
-    os.remove(db.db_config.get_email_path(email.id))
-    
 def load_database(db_config):
 
     """
