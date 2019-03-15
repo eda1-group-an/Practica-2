@@ -152,9 +152,11 @@ def load_database(db_config):
                         
                 elif linea == "End": #We check for the 2 important folders
                     if not inbox_present:
-                        raise MailManagerException("no Inbox folder!")
+                        print("no Inbox folder! Program will stop due to a config mistake")
+                        raise MailManagerException()
                     if not outbox_present:
-                        raise MailManagerException("no OutBox folder!")
+                        print("no OutBox folder! Program will stop due to a config mistake")
+                        raise MailManagerException()
                     break
         except:
             raise MailManagerException("EMConfig has some mistakes!")
