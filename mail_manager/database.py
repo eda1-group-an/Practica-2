@@ -58,12 +58,8 @@ class Database:
     This class is the one in charge of managing the different operations of the database like
     adding and removing emails and folders
     """
-    #Queda por hacer: 
-        #Ver si funciona unlink, add_email por el problema de la comparativa. No puedo comparar un node.data con un email??
-        #Buscar texto (queda por hacer)
 
     #Control de parámetros:
-        #Parametro references de un mail una vez se ha creado. Sumamos con add_email y restamos con remove_email
         #Parametro seed: Vamos controlando el seed con el que se generan los id de los correos
 
     #Funcionalidades: 

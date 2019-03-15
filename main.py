@@ -114,9 +114,7 @@ def lista (db,folder_name = None):
     :param db: An email database
     :param folder_name:  The folder where it looks. If its None, then it shows the list of the mails in the entire database
     """
-    contador = 1 #For the numbering at the start of each string
-    max_size = 35 # For addind "..." when the subject is too large
-    reduced_size = 32 #The new size for the subject if its too large. 25 minus 3 points("...") = 22 
+    contador = 1 #For the numbering at the start of each string 
     pad = 50 # For a better visualization of the list
     secondpad = pad*2 # The second padding is at the double of distance than the first
     space = " " #For adding spaces when padding
@@ -125,20 +123,10 @@ def lista (db,folder_name = None):
         for email_id in db.get_email_ids(folder_name):
             string = "" #The line we are going to pring
             to_print = db.get_email(email_id) #We will use some email properties that will be displayed at the list
-
-            if len(to_print.subject) > max_size: #We control the size to a max of chars
-                new_subject = to_print.subject[:reduced_size] + "..."
-            else:
-                new_subject = to_print.subject
             
-            if len(to_print.sender) > max_size: #We control the size of a sender to a max of chars
-                new_sender =to_print.sender[:reduced_size] + "..."
-            else:
-                new_sender = to_print.sender
-            
-            string += ("%s. Sender: %s." % (contador,new_sender))
+            string += ("%s. Sender: %s." % (contador,trim(to_print.sender)))
             string += (pad - len(string)) * space
-            string += ("Subject: %s." % (new_subject))
+            string += ("Subject: %s." % (trim(to_print.subject)))
             string += (secondpad - len(string)) * space
             string +=  ("Date: %s." % (to_print.date))
             print(string)
@@ -148,6 +136,17 @@ def lista (db,folder_name = None):
     else: # We do not display empty lists
         print("No items in this list yet!")
 
+def trim(text):
+    """
+
+    """
+    max_size = 35 # For addind "..." when the subject is too large
+    reduced_size = 32 #The new size for the subject if its too large. 25 minus 3 points("...") = 22
+
+    if len(text) > max_size: #We control the size of a sender to a max of chars
+        return text[:reduced_size] + "..."
+    else:
+        return text
 def show_email(db):
     """
     This function calls to the choose_email function and it shows the content of the given email chosen
@@ -277,11 +276,15 @@ def create_folder(db):
     :param db: An email database.
     """
 
-    #We do not demmand confirmation for this process. The user can always delet it afterwards
-    print("")  #Aesthetical
-    print("Please enter the name of the new folder.")
-    db.create_folder(restricted(input("Name: ")))
-    print("\nFolder created!") #For confirmation
+    try:
+        #We do not demmand confirmation for this process. The user can always delet it afterwards
+        print("")  #Aesthetical
+        print("Please enter the name of the new folder.")
+        db.create_folder(restricted(input("Name: ")))
+        print("\nFolder created!") #For confirmation
+    except:
+        print("")
+        print("There's a Folder with that name already!")
 
 def delete (cancelled):
     """

@@ -139,11 +139,10 @@ class LinkedList:
                     if current.next.data == item: #When comparing nodes with emails, we acces to the .data atribute
                         current.next = current.next.next #We just ignore the element with this line
                         self.size -= 1
+                        if self.size == 0:
+                            self.clear() #If we emptied the list, we reset it (the header atm)
                         break
                 current = current.next
-
-        if self.size == 0:
-            self.clear() #If we emptied the list, we reset it (the header atm)
 
         if not current: #If current == next it means no matches were made. Error!        
             raise ValueError("Email not found...")

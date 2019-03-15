@@ -39,9 +39,6 @@ def load_email(email_dir, email_id, email_extension='.txt'):
                 else:
                     body += line
                     body += "\n" #We want to respect the original spacing
-
-            if head ==True:
-                raise MailManagerException("Mail has some mistakes")
     
     except FileNotFoundError:
         raise MailManagerException("Mail not found...")
