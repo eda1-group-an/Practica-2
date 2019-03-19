@@ -179,6 +179,7 @@ class LinkedList:
         """
 
         #Not implemented
+        
 
     def __len__(self):
         """
