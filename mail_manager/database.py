@@ -7,7 +7,7 @@ from .email import Email
 from .folder import Folder
 from .exceptions import MailManagerException
 from .linked_list import LinkedList
-
+#Hola
 class DatabaseConfiguration:
     """
     This class allow us to configure all the different parameters of the database such as its location.
