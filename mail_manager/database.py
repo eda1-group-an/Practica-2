@@ -26,7 +26,7 @@ class DatabaseConfiguration:
 
         self.database_dir = database_dir
         self.config_filename = config_filename
-
+        #Hola
         if email_dir:
             self.email_dir = email_dir
         else:
